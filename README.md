@@ -25,6 +25,18 @@ unaffordable broadband prices, exacerbates inequality, by restricting
 opportunities for communication, education, and employment to those who
 need them most, like unemployed citizens (Fingas 2018).
 
+# Data
+
+| Name/Link                         | Rows  | Vars | Unit          |
+| --------------------------------- | ----- | ---- | ------------- |
+| ConnectBoulder Wi-Fi Usage        | ???   | 15   | Wi-Fi Session |
+| NYS Broadband Availability        | 1,635 | 24   | Municipality  |
+| People Without Internet           | 821   | 23   | Municipality  |
+| Urban Rate Broadband Survey       | 9,122 | 14   | ISP in Market |
+| Gamin, Jobs, and Broadband Survey | ???   | 140  | Person        |
+
+# Works Cited
+
 <div id="refs" class="references">
 
 <div id="ref-fingas">
