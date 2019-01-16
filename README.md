@@ -1,7 +1,7 @@
 Visual Analysis of US Broadband Disparities
 ================
 
-# Background
+## Background
 
 As online services and devices become increasingly ingrained and
 necessary in our lives in the modern world, the Internet infrastructure
@@ -26,7 +26,7 @@ opportunities for communication, education, and employment to those who
 need them most, like unemployed citizens (Fingas
 2018).
 
-# Data
+## Data
 
 | Name/Link                                                                                                               | Rows  | Vars | Unit          |
 | ----------------------------------------------------------------------------------------------------------------------- | ----- | ---- | ------------- |
@@ -36,7 +36,7 @@ need them most, like unemployed citizens (Fingas
 | [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)       | 9,122 | 14   | ISP in Market |
 | [Gaming, Jobs, and Broadband Survey](http://www.pewinternet.org/dataset/june-2015-gaming-jobs-broadband/)               | ???   | 140  | Person        |
 
-# Works Cited
+## Works Cited
 
 <div id="refs" class="references">
 
