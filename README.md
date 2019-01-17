@@ -28,13 +28,13 @@ need them most, like unemployed citizens (Fingas
 
 ## Data
 
-| Name/Link                                                                                                               | Rows  | Vars | Unit          |
-| ----------------------------------------------------------------------------------------------------------------------- | ----- | ---- | ------------- |
-| [ConnectBoulder Wi-Fi Usage](http://data.opencolorado.org/dataset/boulder-connect-boulder-wifi-usage)                   | ???   | 15   | Wi-Fi Session |
-| [NYS Broadband Availability](https://data.ny.gov/Economic-Development/Broadband-Availability-By-Municipality/sjc6-ftj4) | 1,635 | 24   | Municipality  |
-| [People Without Internet](https://www.kaggle.com/madaha/people-without-internet)                                        | 821   | 23   | Municipality  |
-| [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)       | 9,122 | 14   | ISP in Market |
-| [Gaming, Jobs, and Broadband Survey](http://www.pewinternet.org/dataset/june-2015-gaming-jobs-broadband/)               | ???   | 140  | Person        |
+| Name/Link                                                                                                               | Rows      | Vars | Unit          |
+| ----------------------------------------------------------------------------------------------------------------------- | --------- | ---- | ------------- |
+| [ConnectBoulder Wi-Fi Usage](http://data.opencolorado.org/dataset/boulder-connect-boulder-wifi-usage)                   | 4,517,064 | 15   | Wi-Fi Session |
+| [NYS Broadband Availability](https://data.ny.gov/Economic-Development/Broadband-Availability-By-Municipality/sjc6-ftj4) | 1,635     | 24   | Municipality  |
+| [People Without Internet](https://www.kaggle.com/madaha/people-without-internet)                                        | 821       | 23   | Municipality  |
+| [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)       | 9,122     | 14   | ISP in Market |
+| [Gaming, Jobs, and Broadband Survey](http://www.pewinternet.org/dataset/june-2015-gaming-jobs-broadband/)               | 2,001     | 140  | Person        |
 
 ## Works Cited
 
