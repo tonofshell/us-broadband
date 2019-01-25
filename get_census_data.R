@@ -1,0 +1,12 @@
+library(tidyverse)
+library(ggplot2)
+library(here)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(tidycensus)
+source("api_keys.R")
+census_api_key(census_key)
+
+acs_vars_17 = load_variables(year = 2017, dataset = "acs5")
+acs_17 = get_acs(geography = "zcta", year = 2017, variables = c(total_pop = "B00001_001", white = "C02003_003", aggr_fam_inc = "B19127_001", inet_w_sub = "B28002_002", dial_up_only = "B28002_003", broadband_any = "B28002_004", cell_inet = "B28002_005", cell_inet_only = "B28002_006", broadband_wired = "B28002_007", broadband_wired_only = "B28002_008", satelite = "B28002_009", satelite_only = "B28002_010", other_inet = "B28002_011", inet_wo_sub = "B28002_012", no_inet = "B28002_013" ))
