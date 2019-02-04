@@ -1,6 +1,8 @@
 ---
 title: "Visual Analysis of US Broadband Disparities"
-output: html_document
+output: 
+  html_document:
+    css: style.css
 references:
   - id: fingas
     title: Microsoft Says the Rural Broadband Divide Is Worse than You Think
@@ -35,6 +37,7 @@ references:
     issued:
       year: 2018
 ---
+<head> <link href="http://fonts.googleapis.com/css?family=Contrail+One|Pragati+Narrow|Roboto+Condensed:300" rel="stylesheet"> </head>
 
 ## Background
 
@@ -62,13 +65,22 @@ library(mapdata)
 library(stringr)
 library(scales)
 library(ggnewscale)
+library(colorspace)
+library(multiscales)
+library(sf)
+
+source("theme.R")
+
+# install.packages("colorspace", repos = "http://R-Forge.R-project.org")
+devtools::install_github("clauswilke/multiscales")
 ```
 
 ##People Without Internet (American Community Survey 2016)
-```{r acs-16-1, include=FALSE}
+```{r acs-16-1, include=FALSE, cache=TRUE}
 people_net = read_csv(here("Datasets", "US_People_Without_Internet.csv"))
 state_regions = bind_rows(filter(state.fips, !str_detect(polyname, ":")), filter(state.fips, str_detect(polyname, ":main")))[4:5] %>% bind_rows(tibble(division = c(9, 9), abb = c("AK", "HI")))
-state_regions$division = state_regions$division  %>% ordered(levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9), labels = c("New England", "Middle Atlantic", "East North Central", "West North Central", "South Atlantic", "East South Central", "West South Central", "Mountain", "Pacific"))
+state_regions$division = state_regions$division  %>% factor()
+levels(state_regions$division) = list(Northeast = c(1,2), Midwest = c(3, 4), South = c(5, 6, 7), West = c(8, 9))
 
 people_net = merge(people_net, tibble(region = state_regions$division, state = state_regions$abb))
 
@@ -79,9 +91,10 @@ cor(people_net$percent_no_internet, people_net$percent_white, use = "complete.ob
 ```
 
 
-```{r acs-16-2}
+```{r acs-16-2, cache=TRUE}
 ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty)) + 
   geom_point(aes(size = P_total, color = region), alpha = 0.6) + 
+  scale_color_manual(values = color_pal4) +
   geom_smooth(method='lm',formula=y~x, color = "dark grey") + 
   labs(title = "Communities with Higher Poverty Rates Have Less Internet Access", 
        subtitle = "US Counties that have a higher percentage of people with no Internet also \nhave a higher percentage of residents below the poverty line", 
@@ -91,15 +104,33 @@ ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty
        color = "Region", size = "Total Population") + 
   scale_x_log10(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)) + 
   scale_y_log10(breaks = c(0, 5, 10, 15, 20, 25, 30)) + 
-  theme_light()
+  theme_master()
 ```
 
 As stated previously, there is evidence that a lack of Internet access can exacerbate inequality. While there is not enough evidence to make a causal relationship, the strong correlation between poverty and Internet access at least shows that a relationship does exist between the two. The lack of a clear trend between region or county population and this internet access - poverty relationship suggests that this relationship holds true across all of America.
 
+```{r acs-16-3, cache=TRUE}
+ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty)) + 
+  geom_smooth(method='lm',formula=y~x, color = "dark grey") + 
+  geom_point(aes(size = P_total, color = region), alpha = 0.6) + 
+  scale_color_manual(values = color_pal4) +
+  facet_wrap(~ region) +
+  labs(title = "The West and South Have Larger Disparities in Inequality", 
+       subtitle = "The Southern and Western US have more areas with better internet and less poverty and vice versa \nwhen compared to the Northeast and Midwest", 
+       x = "Percent with no Internet", 
+       y = "Percent Below Poverty Line", 
+       caption="US Census 2016 American Community Survey", 
+       color = "Region", size = "Total Population") + 
+  scale_x_log10(breaks = c(0, 5, 10, 20, 35, 50)) + 
+  scale_y_log10(breaks = c(0, 5, 10, 30)) + 
+  theme_master()
+```
+
+However, despite the increased variance in the South and West, the relationship between Internet Access and Poverty holds true across the US. Perhaps the wider range of population density in the South and West exacerbates the disparity of this relationship. The extreme outlier in the lower left corner in Western America, is Douglas County, which is in the top 10 most populated counties in Colorado.
 
 ## Urban Broadband Survey
 
-```{r ubs-setup, include=FALSE}
+```{r ubs-setup, include=FALSE, cache=TRUE}
 urban_bb = read_csv2(here("Datasets", "US_Urban_Rate_Broadband_Survey.csv"))
 urban_bb$`Total Charge` = round(as.numeric(urban_bb$`Total Charge`))
 urban_bb$`Download Bandwidth Mbps` = round(as.numeric(urban_bb$`Download Bandwidth Mbps`))
@@ -111,12 +142,12 @@ perc_not_bb = sum(urban_bb$`Download Bandwidth Mbps` < 25) / length(urban_bb$`Do
 ```
 
 
-```{r ubs-1, message=FALSE, warning=FALSE}
+```{r ubs-1, message=FALSE, warning=FALSE, cache=TRUE}
 chart_labels = tibble(text = c('FCC \nBroadband \nCutoff', 'Trendline'), x = c(8.5, 750), y = c(25, 2500))
 
 ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) + 
-  geom_smooth(method='lm', formula=y~x, color = "brown") + 
-  geom_point(color = "red", alpha = 0.5) + 
+  geom_smooth(method='lm', formula=y~x, color = "grey") + 
+  geom_point(color = color_pal[4], alpha = 0.5) + 
   geom_hline(yintercept = 25, linetype = 2) + 
   geom_label(data = chart_labels, aes(x = x, y = y, label = text), alpha = 0.95) + 
   scale_y_continuous(trans = "log10") +
@@ -125,15 +156,16 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
        subtitle = paste("Even in urban areas, ", round(perc_not_bb, 0), "% of survey respondents from 2015 - 2018 had internet slower \nthan the 25 Mbps minimum download speed for broadband as defined by the FCC", sep = ""),
        x = "Total Monthly Internet Cost (USD)",
        y = "Download Speed (Mbps)", caption = "Urban Rate Broadband Survey") +
-  theme_light()
+  theme_master()
 ```
 
 Existing literature suggests that rural areas have disproportionately less broadband Internet access than urban areas. However, even in urban areas, Internet access can be extremely expensive, even for access that does not meet the FCC's minimum bandwidth requirements to be legally considered broadband internet. While, for the most part, people can pay more to get faster speeds, inflated pricing disproportionately affects lower income families, who may become stuck with slow internet as it is all that they can afford.
 
-```{r ubs-2, message=FALSE, warning=FALSE}
+```{r ubs-2, message=FALSE, warning=FALSE, cache=TRUE}
 ggplot(data = filter(urban_bb, Technology != "Other"), aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) + 
   geom_smooth(method='lm', formula=y~x, color = "grey") + 
   geom_point(aes(color = Technology), alpha = 0.5) + 
+  scale_color_manual(values = color_pal4) +
   geom_hline(yintercept = 25, linetype = 2) + 
   facet_wrap(~ Technology) +
   scale_y_continuous(trans = "log10") +
@@ -142,15 +174,16 @@ ggplot(data = filter(urban_bb, Technology != "Other"), aes(x = `Total Charge`, y
        x = "Total Monthly Internet Cost (USD)",
        y = "Download Speed (Mbps)", 
        caption = "Urban Rate Broadband Survey") +
-  theme_light()
+  theme_master()
 ```
 
 Naturally, download speeds vary by the technology that Internet Service Providers use in their network. Fiber to the Home offers the highest speeds, followed by cable, however both have a similar price to speed ratio. DSL is typically much slower, but also less expensive, while Fixed Wireless is, overall, more expensive for the same speeds compared to other technologies.
 
-```{r ubs-3, message=FALSE, warning=FALSE}
+```{r ubs-3, message=FALSE, warning=FALSE, cache=TRUE}
 ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) + 
   geom_smooth(method='lm', formula=y~x, color = "grey") + 
-  geom_point(aes(color = Year), alpha = 0.5) + 
+  geom_point(aes(color = ordered(Year)), alpha = 0.5) + 
+  scale_color_manual(values = color_pal_cool) +
   geom_hline(yintercept = 25, linetype = 2) + 
   facet_wrap(~ Year) +
   scale_y_continuous(trans = "log10") +
@@ -158,66 +191,96 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
   labs(title = "Download Speeds and Costs Vary by Year",
        subtitle = "Even as faster speeds have become more common over time, the relationship \nbetween price and download speed has changed very little.",
        x = "Total Monthly Internet Cost (USD)",
-       y = "Download Speed (Mbps)", 
+       y = "Download Speed (Mbps)",
+       color = "Year",
        caption = "Urban Rate Broadband Survey") +
-  theme_light()
+  theme_master()
 ```
 
-```{r ubs-4, message=FALSE, warning=FALSE}
+```{r ubs-4, message=FALSE, warning=FALSE, cache=TRUE}
 ggplot(data = urban_bb, aes(x = factor(`Year`), y = `Total Charge`)) +
-  geom_violin(aes(color = Year, fill = Year)) +
+  geom_violin(aes(color = ordered(Year), fill = ordered(Year))) +
+  scale_color_manual(values = color_pal_cool) +
+  scale_fill_manual(values = color_pal_cool) +
   scale_y_continuous(trans = "log10", breaks = c(10, 30, 50, 100, 150, 300, 1000)) +
   labs(title = "Monthly Internet Costs Have Increased Slightly",
        subtitle = "Most people paid around $50 for Internet access every month in 2015-2018. \nHowever, less people are paying less than $50 and more between $50-100 in 2018 than 2015.",
        x = "Year",
+       fill = "Year",
+       color = "Year",
        y = "Total Monthly Internet Cost (USD)",
        caption = "Urban Rate Broadband Survey") +
-  theme_light()
+  theme_master() +
+  theme(legend.position="none")
 ```
 
-```{r ubs-5, message=FALSE, warning=FALSE}
+```{r ubs-5, message=FALSE, warning=FALSE, cache=TRUE}
 chart_labels = tibble(text = c('FCC \nBroadband \nCutoff'), x = c(0.75), y = c(25))
 ggplot(data = urban_bb, aes(x = factor(`Year`), y = `Download Bandwidth Mbps`)) +
-  geom_violin(aes(color = Year, fill = Year)) +
+  geom_violin(aes(color = ordered(Year), fill = ordered(Year))) +
+  scale_color_manual(values = color_pal_cool) +
+  scale_fill_manual(values = color_pal_cool) +
   scale_y_continuous(trans = "log10", breaks = c(1, 5, 20, 50, 100, 300, 1000, 10000)) +
   geom_hline(yintercept = 25, linetype = 2, color = "grey55") + 
   geom_label(data = chart_labels[1,], aes(x = x, y = y, label = text), alpha = 0.95) + 
   labs(title = "Download Speeds Have Increased Significantly",
        subtitle = "High-speed Internet, especially Gigabit Internet subscribtions have increased noticeably between 2015 and 2018 \nStill, many people remained on Internet plans with speeds below the FCC minimum for broadband \nat less than 25 Mbps in 2018",
        x = "Year",
+       fill = "Year",
+       color = "Year",
        y = "Download Speed (Mbps)",
        caption = "Urban Rate Broadband Survey") +
-  theme_light()
+  theme_master() +
+  theme(legend.position="none")
 ```
 
 Even though prices have slightly increases, there is a clear trend in people purchasing faster internet over time. This perhaps indicates that either people are upgrading their internet to faster speeds as it become available, or that faster internet has become more of a necessity, causing people to be more willing to pay for better internet. Regardless, more people have internet that meets the FCC minimum requirements for broadband in 2018 than 2015.
 
-```{r ubs-6, message=FALSE, warning=FALSE}
+```{r ubs-6, message=FALSE, warning=FALSE, cache=TRUE}
 urban_bb[c(2,5)] %>% table() %>% as_tibble() %>%
   ggplot(aes(x = Year, fill = Technology, y = n)) + 
+  scale_fill_manual(values = color_pal5) +
   geom_bar(position = "fill", stat = "identity") +
   labs(title = "More People are Choosing Fiber to the Home and Fixed Wireless Internet",
        subtitle = "The amount of survey respondents who had Cable or DSL Internet \nhas decreased between 2015 and 2018",
        x = "Year", 
        y = "Percentage of Respondents") +
   scale_y_continuous(labels = percent_format()) +
-  theme_light()
+  theme_master() 
 ```
 
 More people are choosing Fiber to the Home for their internet access in 2018 than previous years. This offers evidence that fiber is becoming more accessible to people, either due to increased investment in fiber infrastructure by ISPs, or from more competitive pricing by ISPs that use Fiber to the Home technology.
 
-## New York State Broadband Availability
-```{r nys-prep, include=FALSE}
-ny_bb = read_csv(here("Datasets", "NY_Broadband_Availability.csv")) 
-states = map_data("state")
-new_york = subset(states, region %in% "new york") 
-ny_map = ggplot(data = new_york, mapping = aes(x = long, y = lat, group = group)) + geom_polygon() + coord_fixed(1.3) + geom_polygon(color = "black", fill = "gray")
+```{r ubs-7, message=FALSE, warning=FALSE, cache=TRUE}
+urban_bb$usage_limit = (urban_bb$`Usage Allowance GB` != "Unlimited")
+urban_bb[c(2,18)] %>% table() %>% as_tibble() %>%
+  ggplot(aes(x = Year, fill = usage_limit, y = n)) + 
+  scale_fill_manual(values = color_pal2[2:1], labels = c("No", "Yes")) +
+  geom_bar(position = "fill", stat = "identity") +
+  labs(title = "Data Caps are Not Disappearing",
+       subtitle = "The amount of survey respondents who had Internet Service with a monthly data cap \nhas neither grown or decreased substantially between 2015 and 2018",
+       x = "Year", 
+       fill = "Has Data Cap",
+       y = "Percentage of Respondents") +
+  scale_y_continuous(labels = percent_format()) +
+  theme_master() 
+```
+Data Caps restrict the Internet service a customer pays for, only allowing a certain amount of data to be transferred per month. This not only disproportionately affects lower income families, it can also make it difficult or impossible to "cut the cord", and switch from TV to video streaming services. Data caps also make it more expensive for small businesses, who often may need to upgrade to "business" internet to avoid overage charges.
 
-counties <- map_data("county")
-ny_county <- subset(counties, region == "new york")
-ny_county_bb = subset(ny_bb, ny_bb$`Municipality Type` == "County") %>% rename("subregion" = "Municipality Name") 
-ny_county_bb$subregion = tolower(ny_county_bb$subregion)
-ny_county_bb = inner_join(ny_county, ny_county_bb)
+## New York State Broadband Availability
+```{r nys-prep, include=FALSE, cache=TRUE}
+ny_bb = read_csv(here("Datasets", "NY_Broadband_Availability.csv")) 
+
+ny_map = st_read(here("Datasets", "US_Shapefile", "tl_2018_us_county.shp")) %>% 
+  subset(STATEFP %in% "36") %>% ggplot() + geom_sf()
+  
+ny_map
+
+ny_county_bb = subset(ny_bb, ny_bb$`Municipality Type` == "County") %>% rename("NAME" = "Municipality Name") 
+ny_county_bb$subregion = tolower(ny_county_bb$NAME)
+ny_county_bb = st_read(here("Datasets", "US_Shapefile", "tl_2018_us_county.shp")) %>% 
+  subset(STATEFP %in% "36") %>%
+  inner_join(ny_county_bb)
 ny_county_bb$pop_dens = ny_county_bb$`2010 Muni Population` / ny_county_bb$`Muni Area (sq mi)`
 
 remove_axes <- theme(
@@ -230,51 +293,64 @@ remove_axes <- theme(
 )
 ```
 
-```{r nys-1, message=FALSE, warning=FALSE}
+```{r nys-1, message=FALSE, warning=FALSE, cache=TRUE}
+ny_county_bb$`# Fiber Providers` = ny_county_bb$`# Fiber Providers` %>% ordered()
+levels(ny_county_bb$`# Fiber Providers`) = list("1" = c(1), "2" = c(2), "3" = c(3), "4" = c(4), "5" = c(5), "6" = c(6), "7+" = c(7,8,9) )
 ggplot(data = ny_county_bb, 
        aes(y = pop_dens, x = as.factor(ny_county_bb$`# Fiber Providers`))) + 
   geom_boxplot(aes(fill = as.factor(ny_county_bb$`# Fiber Providers`))) + 
+  scale_fill_manual(values = color_pal) +
   scale_y_continuous(trans = "log10") + 
   labs(title = "Population Density and Number of Fiber Providers Increase Together",
        subtitle = "The more dense a New York county is, the more likely it is to have several fiber providers",
        x = "Number of Fiber Providers per County", 
        y = "Population Density of County (ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") + 
-  theme_light() +
+  theme_master() +
   theme(legend.position="none")
 ```
 
-```{r nys-2}
+```{r nys-2, cache=TRUE}
 ggplot(data = ny_county_bb, 
        aes(y = pop_dens, 
            x = as.factor(ny_county_bb$`# Cable Providers`))) + 
   geom_boxplot(aes(fill = as.factor(ny_county_bb$`# Cable Providers`))) + 
+  scale_fill_manual(values = color_pal4) +
   scale_y_continuous(trans = "log10") + 
   labs(title = "Population Density and Number of Cable Providers Increase Together",
        subtitle = "The more dense a New York county is, the more likely it is to have several cable providers",
        x = "Number of Cable Providers per County",
        y = "Population Density of County (ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") + 
-  theme_light() +
+  theme_master() +
   theme(legend.position="none")
 ```
 
 This data from New York offers some evidence that there are more ISPs the more population dense a county is. This suggests that ISPs are hesitant to enter a new market in rural areas, either because of the high barrier of entry, or due to existing ISPs in the market protecting their investment through tactics like exclusivity agreements with municipalities. 
 
-```{r nys-3}
-ny_map + geom_polygon(data = ny_county_bb, 
-                 aes(fill = ny_county_bb$`% Hse Units Cable`)) + 
-  scale_fill_gradient(low = "yellow", 
-                       high = "red", "Percent of Units \nwith Cable" ) +
-  new_scale_fill() +
-  geom_polygon(data = ny_county_bb, 
-               aes(fill = ny_county_bb$pop_dens), 
-               alpha = 0.5) + 
-  scale_fill_gradient(low = "white",
-                      high = "blue",
-                      trans = "log10") +
-  geom_polygon(color = "black", fill = NA) + 
-  theme_light() + 
+```{r nys-3, eval=FALSE, cache=TRUE, include=FALSE}
+colors <- scales::colour_ramp(
+  colors = color_pal[c(1,2,3,5,6,7)]
+)((0:7)/7)
+
+ny_map + geom_sf(data = ny_county_bb,
+                 aes(fill = zip(pop_dens,`% Hse Units Cable`)),
+                 color = "gray30", size = 0.2) + 
+  bivariate_scale("fill",
+    pal_vsup(values = colors, max_desat = 0.8, pow_desat = 1, max_light = 0.5, pow_light = 1),
+    name = c("Population Density", "Internet Access"),
+    limits = list(c(0, 100000), c(0,1)),
+    breaks = list(c(0, 10, 100, 1000, 10000, 100000), c(1, 0.75, 0.5, 0.25, 0)),
+    labels = list(waiver(), scales::percent),
+    guide = "colourfan"
+  ) +
+  theme_void() +
+  theme(
+    legend.key.size = grid::unit(0.8, "cm"),
+    legend.title.align = 0.5,
+    plot.margin = margin(5.5, 20, 5.5, 5.5)
+  ) +
+  theme_master() + 
   remove_axes + 
   labs(title = "Less Populous Counties have Less Cable Internet Coverage",
        subtitle = "More rural counties with less population density proportionately \nhave less households with cable internet",
@@ -284,5 +360,15 @@ ny_map + geom_polygon(data = ny_county_bb,
 
 By layering two scales, one for population density and one for cable Internet coverage, this map shows the relationship between the two in New York. Any highly population dense areas with low cable Internet coverage would show up greenish, while any counties with low population density and high cable Internet coverage would show up pink. Since the spectrum of colors mostly fall on a gradient from light yellow to purple, this most rural areas in New York have less cable internet coverage than the more urban areas.
 
+## Gaming, Jobs, and Broadband Survey
+```{r gjb-1, eval=FALSE, cache=TRUE, include=FALSE}
+gam_job_bb = read_csv(here("Datasets", "US_Gaming_ Jobs_Broadband.csv")) 
+gam_job_bb$intfreq = gam_job_bb$intfreq %>% ordered()
+labels(gam_job_bb$intfreq) = list("Almost constantly" = c(1), "Several times a day" = c(2), "About once a day" = c(3), "Several times a week" = c(4), "Less often" = c(5), "NA" = c(8))
+table(gam_job_bb$intfreq) %>% head()
+ggplot(gam_job_bb, aes(intfreq, q1, fill = Percentage)) +
+  geom_tile(show.legend = FALSE) +
+  geom_text(aes(label = paste0(Percentage, "%")), color = "white")
+```
 
 ## Works Cited

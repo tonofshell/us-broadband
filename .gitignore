@@ -5,4 +5,5 @@
 .csv
 .sav
 Datasets/
+index_cache/
 api_keys.R

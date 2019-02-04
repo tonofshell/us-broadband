@@ -1,0 +1,16 @@
+h1{
+  font-family: 'Contrail One', cursive;
+  font-size: 64pt;
+  background: linear-gradient(to right, #FF501E, #0FA8D1 80%);
+  -webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+h2,h3,h4,h5,h6{
+  font-family: "Pragati Narrow", sans-serif;
+}
+
+p{
+ font-family: 'Roboto Condensed', sans-serif; 
+ font-size: 13pt;
+}
