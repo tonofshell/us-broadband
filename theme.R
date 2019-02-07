@@ -39,8 +39,8 @@ hide_legend = theme(
 
 color_pal = function(n, type = "discrete", reverse = FALSE) {
   order_main = c("extra_light", "light", "normal", "dark")
-  colors_warm = c("#FFD747", "#FFAF3C", "#F55A0F", "#D7320F")
-  colors_cool = c("#3CFF96", "#32E6D7", "#0FA0F5", "#0A55CD")
+  colors_warm = c("#FFD747", "#FFAF3C", "#EB5028", "#D73219")
+  colors_cool = c("#64E687", "#1ED7AA", "#0FA0F5", "#0A55CD")
   
   order_mid = c("neutral", "spectral")
   colors_mid = c("#C8DCC8", "#E6E673")
