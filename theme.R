@@ -3,7 +3,7 @@ library(extrafont)
 #font_import()
 loadfonts(device = "win")
 
-theme_master = function (base_size = 15, base_line_size = base_size/22, base_rect_size = base_size/22) {
+theme_master = function (base_size = 20, base_line_size = base_size/22, base_rect_size = base_size/22) {
   half_line <- base_size/2
   theme_light(base_size = base_size, base_family = "Pragati Narrow") +
     theme(
@@ -27,79 +27,102 @@ theme_map = function(base_size = 15, base_line_size = base_size/22, base_rect_si
       axis.ticks = element_blank(),
       panel.border = element_blank(),
       panel.grid = element_blank(),
-      axis.title = element_blank()
+      axis.title = element_blank(),
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank()
     )
 }
 
 hide_legend = theme(
+  legend.position = "none",
   legend.background = element_blank(),
   legend.key = element_blank(),
   legend.title = element_blank()
 )
 
-color_pal = function(n, type = "discrete", reverse = FALSE) {
-  order_main = c("extra_light", "light", "normal", "dark")
-  colors_warm = c("#FFD747", "#FFAF3C", "#EB5028", "#D73219")
-  colors_cool = c("#64E687", "#1ED7AA", "#0FA0F5", "#0A55CD")
+color_pal = function(n, type = "discrete", reverse = FALSE, spectral = FALSE) {
+  #Discrete - distinct categories
+  #Segmented - two sided continuous with neutral center
+  #Continuous - like segmented but w/o neutral center
+  order_mid = c("grey", "pale_yellow", "purple", "dark grey")
+  colors_mid = c("#C8DCC8", "#E6E673", "#9146F0", "#5A5A5A")
   
-  order_mid = c("neutral", "spectral")
-  colors_mid = c("#C8DCC8", "#E6E673")
+  
+  if (spectral) {
+    order_spect = c("extra_light", "light", "normal", "dark")
+    colors_warm = c("#FFD747", "#FFAF3C", "#EB5028", "#D73219")
+    colors_cool = c("#64E687", "#1ED7AA", "#0FA0F5", "#0A55CD")
+   
+  } else {
+    order_main = c("mid_offset", "light", "normal", "dark")
+    colors_warm = c("#FFD747", "#FF7837", "#EB5028", "#D73219")
+    colors_cool = c("#B1E651", "#1ED2D7", "#0FA0F5", "#0A55CD")
+  }
   
   final = switch (as.character(n),
-          "1" = switch (type,
-            "discrete" = colors_warm[3],
-            "continuous" = colors_cool[3],
-            "warm" = colors_warm[3],
-            "cool" = colors_cool[3]
-          ),
-          "2" = switch (type, 
-                     "discrete" = c(colors_warm[3], colors_cool[3]),
-                     "continuous" = c(colors_warm[3], colors_cool[3]),
-                     "warm" = c(colors_warm[2], colors_warm[3]),
-                     "cool" = c(colors_cool[2], colors_cool[3])
-          ), 
-          "3" = switch (type,
-            "discrete" = c(colors_warm[3], colors_mid[1], colors_cool[3]),
-            "continuous" = c(colors_warm[3], colors_mid[2], colors_cool[3]),
-            "warm" = c(colors_warm[], colors_warm[2], colors_warm[3]),
-            "cool" = c(colors_cool[1], colors_cool[2], colors_cool[3])
-          ),
-          "4" = switch (type, 
-                      "discrete" = c(colors_warm[3], colors_warm[1], colors_cool[1], colors_cool[3]),
-                      "continuous" = c(colors_warm[4], colors_warm[3], colors_cool[3], colors_cool[4]),
-                      "warm" = c(colors_warm[1], colors_warm[2], colors_warm[3], colors_warm[4]),
-                      "cool" = c(colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4])
-          ),
-          "5" = switch (type, 
-                      "discrete" = c(colors_warm[3], colors_warm[1], colors_mid[1], colors_cool[1], colors_cool[3]),
-                      "continuous" = c(colors_warm[3], colors_warm[2], colors_mid[2], colors_cool[2], colors_cool[3]),
-                      "warm" = c(colors_middle[2], colors_warm[1], colors_warm[2], colors_warm[3], colors_warm[4]),
-                      "cool" = c(colors_middle[2], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4])
-          ),
-          "6" = switch (type, 
-                      "discrete" = c(colors_warm[4], colors_warm[3], colors_warm[1], colors_cool[1], colors_cool[3], colors_cool[4]),
-                      "continuous" = c(colors_warm[3], colors_warm[2], colors_warm[1], colors_cool[1], colors_cool[2], colors_cool[3]),
-                      "warm" = warning("No palette for this type and number"),
-                      "cool" = warning("No palette for this type and number")
-          ),
-          "7" = switch (type, 
-                      "discrete" = c(colors_warm[4], colors_warm[3], colors_warm[1], colors_mid[1], colors_cool[1], colors_cool[3], colors_cool[4]),
-                      "continuous" = c(colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[2], colors_cool[1], colors_cool[2], colors_cool[3]),
-                      "warm" = warning("No palette for this type and number"),
-                      "cool" = warning("No palette for this type and number")
-          ),
-          "8" = switch (type, 
-                      "discrete" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[2], colors_cool[3], colors_cool[3], colors_cool[4]),
-                      "continuous" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4]),
-                      "warm" = warning("No palette for this type and number"),
-                      "cool" = warning("No palette for this type and number")
-          ),
-          "9" = switch (type, 
-                      "discrete" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[1], colors_mid[2], colors_cool[3], colors_cool[3], colors_cool[4]),
-                      "continuous" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[2], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4]),
-                      "warm" = warning("No palette for this type and number"),
-                      "cool" = warning("No palette for this type and number")
-          ) 
+                  "1" = switch (type,
+                                "discrete" = colors_warm[3],
+                                "segmented" = colors_mid[4],
+                                "continuous" = colors_mid[3],
+                                "warm" = colors_warm[1],
+                                "cool" = colors_cool[3]
+                  ),
+                  "2" = switch (type, 
+                                "discrete" = c(colors_warm[3], colors_cool[3]),
+                                "segmented" = c(colors_warm[3], colors_cool[3]),
+                                "continuous" = c(colors_warm[3], colors_cool[3]),
+                                "warm" = c(colors_warm[2], colors_warm[3]),
+                                "cool" = c(colors_cool[2], colors_cool[3])
+                  ), 
+                  "3" = switch (type,
+                                "discrete" = c(colors_warm[3], colors_warm[1], colors_cool[3]),
+                                "segmented" = c(colors_warm[3], colors_mid[1], colors_cool[3]),
+                                "continuous" = c(colors_warm[3], colors_mid[2], colors_cool[3]),
+                                "warm" = c(colors_warm[], colors_warm[2], colors_warm[3]),
+                                "cool" = c(colors_cool[1], colors_cool[2], colors_cool[3])
+                  ),
+                  "4" = switch (type, 
+                                "discrete" = c(colors_mid[4], colors_warm[3], colors_warm[1], colors_cool[3]),
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_mid[1], colors_cool[4]),
+                                "continuous" = c(colors_warm[4], colors_warm[3], colors_cool[3], colors_cool[4]),
+                                "warm" = c(colors_warm[1], colors_warm[2], colors_warm[3], colors_warm[4]),
+                                "cool" = c(colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4])
+                  ),
+                  "5" = switch (type, 
+                                "discrete" = c(colors_mid[4], colors_warm[3], colors_warm[1], colors_cool[3], colors_mid[3]),
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_mid[1], colors_cool[3], colors_cool[4]),
+                                "continuous" = c(colors_warm[3], colors_warm[2], colors_mid[2], colors_cool[2], colors_cool[3]),
+                                "warm" = c(colors_middle[2], colors_warm[1], colors_warm[2], colors_warm[3], colors_warm[4]),
+                                "cool" = c(colors_middle[2], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4])
+                  ),
+                  "6" = switch (type, 
+                                "discrete" = c(colors_mid[4], colors_warm[3], colors_warm[1], colors_cool[3], colors_mid[3], colors_cool[1]),
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_mid[1], colors_cool[3], colors_cool[4]),
+                                "continuous" = c(colors_warm[3], colors_warm[2], colors_warm[1], colors_cool[1], colors_cool[2], colors_cool[3]),
+                                "warm" = warning("No palette for this type and number"),
+                                "cool" = warning("No palette for this type and number")
+                  ),
+                  "7" = switch (type, 
+                                "discrete" =warning("No palette for this type and number"), 
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_mid[1], colors_cool[2], colors_cool[3], colors_cool[4]),
+                                "continuous" = c(colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[2], colors_cool[1], colors_cool[2], colors_cool[3]),
+                                "warm" = warning("No palette for this type and number"),
+                                "cool" = warning("No palette for this type and number")
+                  ),
+                  "8" = switch (type, 
+                                "discrete" = warning("No palette for this type and number"),
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[1], colors_cool[2], colors_cool[3], colors_cool[4]),
+                                "continuous" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4]),
+                                "warm" = warning("No palette for this type and number"),
+                                "cool" = warning("No palette for this type and number")
+                  ),
+                  "9" = switch (type, 
+                                "discrete" = warning("No palette for this type and number"),
+                                "segmented" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[1], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4]),
+                                "continuous" = c(colors_warm[4], colors_warm[3], colors_warm[2], colors_warm[1], colors_mid[2], colors_cool[1], colors_cool[2], colors_cool[3], colors_cool[4]),
+                                "warm" = warning("No palette for this type and number"),
+                                "cool" = warning("No palette for this type and number")
+                  ) 
   )
   
   if (reverse) {
