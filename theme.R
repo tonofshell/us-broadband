@@ -2,8 +2,9 @@ library(extrafont)
 
 #font_import()
 loadfonts(device = "win")
+b_size = 18
 
-theme_master = function (base_size = 20, base_line_size = base_size/22, base_rect_size = base_size/22) {
+theme_master = function (base_size = b_size, base_line_size = base_size/22, base_rect_size = base_size/22) {
   half_line <- base_size/2
   theme_light(base_size = base_size, base_family = "Pragati Narrow") +
     theme(
@@ -19,7 +20,7 @@ theme_master = function (base_size = 20, base_line_size = base_size/22, base_rec
     )
 }
 
-theme_map = function(base_size = 15, base_line_size = base_size/22, base_rect_size = base_size/22) {
+theme_map = function(base_size = b_size, base_line_size = base_size/22, base_rect_size = base_size/22) {
   theme_master() + 
     theme(
       axis.text = element_blank(),

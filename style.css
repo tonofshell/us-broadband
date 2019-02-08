@@ -1,7 +1,7 @@
 h1{
   font-family: 'Contrail One', cursive;
   font-size: 64pt;
-  background: linear-gradient(to right, #FF501E, #0FA8D1 80%);
+  background: linear-gradient(to right, #EB5028, #9146F0, #0FA0F5 80%);
   -webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 }

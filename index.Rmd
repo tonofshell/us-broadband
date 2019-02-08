@@ -80,7 +80,7 @@ options(device = Cairo::CairoWin)
 
 # install.packages("colorspace", repos = "http://R-Forge.R-project.org")
 devtools::install_github("clauswilke/multiscales")
-knitr::opts_chunk$set(fig.width=12, fig.height=8) 
+knitr::opts_chunk$set(fig.width=10, fig.height=7) 
 ```
 
 ##People Without Internet (American Community Survey 2016)
@@ -267,7 +267,8 @@ urban_bb[c(2,5)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
   labs(title = "More People are Choosing Fiber to the Home and Fixed Wireless Internet",
        subtitle = "The amount of survey respondents who had Cable or DSL Internet \nhas decreased between 2015 and 2018",
        x = "Year", 
-       y = "Percentage of Respondents") +
+       y = "Percentage of Respondents",
+       caption = "Urban Rate Broadband Survey") +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) +
   theme_master() 
 ```
@@ -283,9 +284,10 @@ urban_bb[c(2,18)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
   labs(title = "Data Caps are Not Disappearing",
        subtitle = "The amount of survey respondents who had Internet Service with a monthly data cap \nhas neither grown or decreased substantially between 2015 and 2018",
        x = "Year", 
-       fill = "Has Data Cap",
-       y = "Percentage of Respondents") +
-  scale_y_continuous(labels = percent_format(), breaks = c(0, 0.2, 0.4, 0.6)) +
+       color = "Has Data Cap",
+       y = "Percentage of Respondents",
+       caption = "Urban Rate Broadband Survey") +
+  scale_y_continuous(labels = percent_format(), limits = c(0, 0.65)) +
   theme_master() 
 ```
 Data Caps restrict the Internet service a customer pays for, only allowing a certain amount of data to be transferred per month. This not only disproportionately affects lower income families, it can also make it difficult or impossible to "cut the cord", and switch from TV to video streaming services. Data caps also make it more expensive for small businesses, who often may need to upgrade to "business" internet to avoid overage charges.
