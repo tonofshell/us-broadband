@@ -8,8 +8,13 @@ library(tidycensus)
 source("api_keys.R")
 census_api_key(census_key)
 
-acs_vars_17 = load_variables(year = 2017, dataset = "acs5")
-acs_17 = get_acs(geography = "zcta", year = 2017, geometry = TRUE, moe_level = 95,
+save_key = FALSE
+
+if (save_key) {
+  acs_vars_17 = load_variables(year = 2017, dataset = "acs5")
+  saveRDS(acs_vars_17, file = "Datasets/acs_vars_17.rds")
+}
+acs_17 = get_acs(geography = "county", year = 2017, geometry = TRUE, moe_level = 95,
                  variables = c(total_pop = "B01003_001", white = "B02001_002", 
                                med_age = "B01002_001", med_income = "B19326_001", 
                                female = "B01001_026", aggr_fam_inc = "B19127_001", 
@@ -27,7 +32,6 @@ acs_17 = get_acs(geography = "zcta", year = 2017, geometry = TRUE, moe_level = 9
                                tablet_alone = "B28001_008", other_comp_alone = "B28001_010" ))
 acs_17_vals = acs_17 %>% select(-one_of("moe")) %>% spread(key = variable, value = estimate)
 acs_17_moes = acs_17 %>% select(-one_of("estimate")) %>% spread(key = variable, value = moe)
-saveRDS(acs_vars_17, file = "acs_vars_17.rds")
-saveRDS(acs_17, file = "acs_17.rds")
-saveRDS(acs_17_vals, file = "acs_17_vals.rds")
-saveRDS(acs_17_moes, file = "acs17_moes.rds")
+saveRDS(acs_17, file = "Datasets/acs_17.rds")
+saveRDS(acs_17_vals, file = "Datasets/acs_17_vals.rds")
+saveRDS(acs_17_moes, file = "Datasets/acs17_moes.rds")

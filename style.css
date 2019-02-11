@@ -14,3 +14,22 @@ p{
  font-family: 'Roboto Condensed', sans-serif; 
  font-size: 13pt;
 }
+
+div.dark_theme {
+   background-color: #323232;
+   padding: 7px;
+}
+
+div.dark_theme pre { 
+  background-color: #323232; 
+}
+
+div.dark_theme pre.r { 
+  background-color: #464646; 
+  color: #fff;
+}
+
+div.dark_theme p { 
+  background-color: #323232; 
+  color: #fff;
+}
