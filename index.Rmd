@@ -251,7 +251,7 @@ ggplot(data = urban_bb, aes(x = factor(`Year`), y = `Download Bandwidth Mbps`)) 
   theme(legend.position="none")
 ```
 
-Even though prices have slightly increases, there is a clear trend in people purchasing faster internet over time. This perhaps indicates that either people are upgrading their internet to faster speeds as it become available, or that faster internet has become more of a necessity, causing people to be more willing to pay for better internet. Regardless, more people have internet that meets the FCC minimum requirements for broadband in 2018 than 2015.
+Even though prices have slightly increased, there is a clear trend in people purchasing faster internet over time. This perhaps indicates that either people are upgrading their internet to faster speeds as it become available, or that faster internet has become more of a necessity, causing people to be more willing to pay for better internet. Regardless, more people have internet that meets the FCC minimum requirements for broadband in 2018 than 2015.
 </div>
 
 ```{r ubs-6, message=FALSE, warning=FALSE, cache=TRUE}
@@ -326,10 +326,12 @@ ny_county_bb$`# Fiber Providers` = ny_county_bb$`# Fiber Providers` %>% ordered(
 levels(ny_county_bb$`# Fiber Providers`) = list("1" = c(1), "2" = c(2), "3" = c(3), "4" = c(4), "5" = c(5), "6+" = c(6,7,8,9) )
 ggplot(data = ny_county_bb, 
        aes(y = pop_dens, x = as.factor(ny_county_bb$`# Fiber Providers`))) + 
-  geom_boxplot(aes(fill = as.factor(ny_county_bb$`# Fiber Providers`))) + 
+  geom_violin(aes(fill = as.factor(ny_county_bb$`# Fiber Providers`), 
+                  color = as.factor(ny_county_bb$`# Fiber Providers`))) + 
   scale_fill_manual(values = color_pal(6)) +
+  scale_color_manual(values = color_pal(6)) +
   scale_y_continuous(trans = "log10") + 
-  labs(title = "Population Density and Number of Fiber Providers Increase Together",
+  labs(title = "Urban Areas Have More Fiber Internet Choices",
        subtitle = "The more dense a New York county is, the more likely it is to have several fiber providers",
        x = "Number of Fiber Providers per County", 
        y = "Population Density of County (ppl/sq mi)",
@@ -342,10 +344,12 @@ ggplot(data = ny_county_bb,
 ggplot(data = ny_county_bb, 
        aes(y = pop_dens, 
            x = as.factor(ny_county_bb$`# Cable Providers`))) + 
-  geom_boxplot(aes(fill = as.factor(ny_county_bb$`# Cable Providers`))) + 
+  geom_violin(aes(fill = as.factor(ny_county_bb$`# Cable Providers`), 
+                  color = as.factor(ny_county_bb$`# Cable Providers`))) + 
   scale_fill_manual(values = color_pal(4)) +
+  scale_color_manual(values = color_pal(4)) +
   scale_y_continuous(trans = "log10") + 
-  labs(title = "Population Density and Number of Cable Providers Increase Together",
+  labs(title = "Urban Areas Have More Cable Internet Choices",
        subtitle = "The more dense a New York county is, the more likely it is to have several cable providers",
        x = "Number of Cable Providers per County",
        y = "Population Density of County (ppl/sq mi)",
@@ -359,17 +363,21 @@ This data from New York offers some evidence that there are more ISPs the more p
 ```{r nys-3, echo=TRUE}
 ny_county_bb = ny_county_bb [rev(order(ny_county_bb $pop_dens)),]
 
-ny_map + geom_point(data = ny_county_bb, aes(x = INTPTLON,
-                     y = INTPTLAT,
+ny_map + geom_sf(data = ny_county_bb, 
+                 aes(fill = `% Hse Units Cable` / 100,
                      color = `% Hse Units Cable` / 100,
-                     size = pop_dens)) + 
+                     alpha = pop_dens),
+                 size = 1) + 
+ scale_fill_gradientn(colors = color_pal(8, type = "continuous"), 
+                        labels = percent_format(accuracy = 1)) +
   scale_color_gradientn(colors = color_pal(8, type = "continuous"), 
                         labels = percent_format(accuracy = 1)) +
-  scale_size(trans = "log10", range = c(0.5, 8)) +
-  labs(title = "Less Populous Counties have Less Cable Internet Coverage",
-       subtitle = "Rural counties with less population density proportionately have less households with cable internet",
+  scale_alpha(trans = "log", range = c(0.1, 1), limits = c(1, 50000), breaks = c(5, 20, 400, 8000)) +
+  labs(title = "Rural Counties have Less Cable Internet Coverage",
+       subtitle = "Less populous counties proportionately have less households with cable internet",
+       fill = "Percent with \nCable Internet",
        color = "Percent with \nCable Internet",
-       size = "Population Density \n(ppl/sq mi)",
+       alpha = "Population Density \n(ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") +
     theme_map() +
   theme(axis.text = element_blank(),
@@ -377,17 +385,21 @@ ny_map + geom_point(data = ny_county_bb, aes(x = INTPTLON,
 ```
 
 ```{r nys-4}
-ny_map + geom_point(data = ny_county_bb, aes(x = INTPTLON,
-                     y = INTPTLAT,
+ny_map + geom_sf(data = ny_county_bb, 
+                 aes(fill = `% Hse Units Fiber` / 100,
                      color = `% Hse Units Fiber` / 100,
-                     size = pop_dens)) + 
+                     alpha = pop_dens),
+                 size = 1) + 
+  scale_fill_gradientn(colors = color_pal(8, type = "continuous"), 
+                        labels = percent_format(accuracy = 1)) +
   scale_color_gradientn(colors = color_pal(8, type = "continuous"), 
                         labels = percent_format(accuracy = 1)) +
-  scale_size(trans = "log10", range = c(0.5, 8)) +
-  labs(title = "Less Populous Counties have Less Fiber Internet Coverage",
-       subtitle = "Rural counties with less population density proportionately have less households with fiber internet",
+  scale_alpha(trans = "log", range = c(0.1, 1), limits = c(1, 50000), breaks = c(5, 20, 400, 8000)) +
+  labs(title = "Rural Counties have Less Fiber Internet Coverage",
+       subtitle = "Less populous counties proportionately have less households with fiber internet",
+       fill = "Percent with \nFiber Internet",
        color = "Percent with \nFiber Internet",
-       size = "Population Density \n(ppl/sq mi)",
+       alpha = "Population Density \n(ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") +
     theme_map() +
   theme(axis.text = element_blank(), 
@@ -455,14 +467,14 @@ states_sf %>%
   scale_color_gradientn(colors = color_pal(6, type = "warm", reverse = TRUE), labels = percent_format(accuracy = 1)) +
   scale_size(range = c(0.5, 15), breaks = c(50, 500, 5000, 50000)) +
   scale_alpha(range = c(1.0, 0.05)) +
-  labs(title = "Rural Areas have Less Access to Broadband Internet",
+  labs(title = "Rural Counties have Less Access to Broadband Internet",
        subtitle = "Even in urban areas, many households, while having Internet, do not have broadband Internet access",
       color = "Percent with \nBroadband",
        size = "Population Density \n(ppl/sq mi)") +
    theme_map(dark_theme = TRUE) +
   theme(axis.text = element_blank())
 ```
-In rural counties in the United States, while most households have Internet access, many do not have Internet that meets the minimum speed requirements to be considered broadband Internet. However, this varies across the country. For example, Utah has much higher percentages of households for overall Internet access and broadband Internet access than many other rural states. In fact, despite its vastness, the western United States overall has much better accessability to high-speed internet than other areas, most notably the rural South. 
+In rural counties in the United States, while most households have Internet access, many do not have Internet that meets the minimum speed requirements to be considered broadband Internet. However, this varies across the country. For example, Utah has much higher percentages of households for overall Internet access and broadband Internet access than many other rural states. In fact, despite its vastness, the western United States overall has much better accessibility to high-speed internet than other areas, most notably the rural South. 
 
 </div>
 
