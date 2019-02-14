@@ -495,7 +495,7 @@ ny_map + geom_sf(data = ny_county_bb,
                  aes(fill = `% Hse Units Fiber` / 100,
                      color = `% Hse Units Fiber` / 100,
                      alpha = pop_dens),
-                 size = 0.75) + 
+                 size = 0.7) + 
   scale_fill_gradientn(colors = color_pal(5, type = "continuous"), 
                         labels = percent_format(accuracy = 1)) +
   scale_color_gradientn(colors = color_pal(5, type = "continuous"), 
