@@ -52,11 +52,10 @@ These issues are magnified by the gross inaccuracies often found on reports anal
 ## Data
 | Name/Link                          | Rows      | Vars  | Unit          |
 |------------------------------------|-----------|-------|---------------|
-| [ConnectBoulder Wi-Fi Usage](http://data.opencolorado.org/dataset/boulder-connect-boulder-wifi-usage)         | 4,517,064 | 15    | Wi-Fi Session |
 | [NYS Broadband Availability](https://data.ny.gov/Economic-Development/Broadband-Availability-By-Municipality/sjc6-ftj4)         | 1,635       | 24    | Municipality  |
 | [People Without Internet](https://www.kaggle.com/madaha/people-without-internet)            | 821        | 23    | Municipality  |
 | [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)        | 9,122     | 14    | ISP in Market |
-| [Gaming, Jobs, and Broadband Survey](http://www.pewinternet.org/dataset/june-2015-gaming-jobs-broadband/) | 2,001      | 140   | Person        |
+| [American Community Survey 2017 ](https://www.census.gov/programs-surveys/acs/)        | 3,108     | 36    | County |
 ```{r loading-packages, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
 library(ggplot2)
@@ -300,7 +299,7 @@ ggplot(agg_urban_bb, aes(area = as.numeric(counts), fill = down_value, label = G
   theme_master()
 ```
 
-Overall, Fiber to the Home provides the best value for consumers, with cable not far behind. DSL and Fixed Wireless have the worst value on average. While small FTTH ISPs, like Google Fiber, typically provide better value than larger fiber ISPs, this is not true for other technologies. 
+Overall, Fiber to the Home provides the best value for consumers, with cable not far behind. DSL and Fixed Wireless have the worst value on average. While small FTTH ISPs, like Google Fiber, typically provide better value than larger fiber ISPs, this is not true for other technologies, where larger ISPs usually provide better value. 
 
 ```{r ubs-3, message=FALSE, warning=FALSE, cache=TRUE}
 ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) + 
