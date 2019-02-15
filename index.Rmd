@@ -408,26 +408,23 @@ urban_bb[c(2,19)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
 Data Caps restrict the Internet service a customer pays for, only allowing a certain amount of data to be transferred per month. This not only disproportionately affects lower income families, it can also make it difficult or impossible to "cut the cord", and switch from TV to video streaming services. Data caps also make it more expensive for small businesses, who often may need to upgrade to "business" internet to avoid overage charges.
 
 ## New York State Broadband Availability
-```{r nys-prep, include=FALSE, cache=TRUE}
+```{r nys-prep, include=FALSE}
 ny_bb = read_csv(here("Datasets", "NY_Broadband_Availability.csv")) 
 
-ny_map = st_read(here("Datasets", "US_Shapefile", "tl_2018_us_county.shp")) %>% 
-  subset(STATEFP %in% "36") %>% ggplot() + geom_sf(color = "grey90", fill = "white")
+ny_map_data = st_as_sf(map("county", plot = FALSE, fill = TRUE)) %>% separate(ID, c("state", "subregion"), sep = ",") %>%
+  subset(state %in% "new york") %>% .[c(2,3)]
+ny_map_data$subregion = ny_map_data$subregion %>% recode("st lawrence" = "st. lawrence")
   
-ny_map
+ny_map = ny_map_data %>% ggplot() + geom_sf(color = "grey90", fill = "white")
 
 ny_county_bb = subset(ny_bb, ny_bb$`Municipality Type` == "County") %>% rename("NAME" = "Municipality Name") 
 ny_county_bb$subregion = tolower(ny_county_bb$NAME)
-ny_county_bb = st_read(here("Datasets", "US_Shapefile", "tl_2018_us_county.shp")) %>% 
-  subset(STATEFP %in% "36") %>%
-  inner_join(ny_county_bb)
+ny_county_bb = ny_map_data %>% 
+  full_join(ny_county_bb)
 ny_county_bb$pop_dens = ny_county_bb$`2010 Muni Population` / ny_county_bb$`Muni Area (sq mi)`
-
-ny_county_bb$INTPTLON = -as.numeric(substr(ny_county_bb$INTPTLON, start = 3, stop = 11))
-ny_county_bb$INTPTLAT = as.numeric(substr(ny_county_bb$INTPTLAT, start = 2, stop = 11))
 ```
 
-```{r nys-1, message=FALSE, warning=FALSE, cache=TRUE}
+```{r nys-1, message=FALSE, warning=FALSE}
 ny_county_bb$`# Fiber Providers` = ny_county_bb$`# Fiber Providers` %>% ordered()
 levels(ny_county_bb$`# Fiber Providers`) = list("1" = c(1), "2" = c(2), "3" = c(3), "4" = c(4), "5" = c(5), "6+" = c(6,7,8,9) )
 ggplot(data = ny_county_bb, 
@@ -446,7 +443,7 @@ ggplot(data = ny_county_bb,
   theme(legend.position="none")
 ```
 
-```{r nys-2, cache=TRUE}
+```{r nys-2}
 ggplot(data = ny_county_bb, 
        aes(y = pop_dens, 
            x = as.factor(ny_county_bb$`# Cable Providers`))) + 
