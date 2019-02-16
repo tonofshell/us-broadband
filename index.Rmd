@@ -113,7 +113,7 @@ ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty
        subtitle = "US Counties that have a higher percentage of people with no Internet also \nhave a higher percentage of residents below the poverty line", 
        x = "Percent with no Internet", 
        y = "Percent Below Poverty Line", 
-       caption="US Census 2016 American Community Survey", 
+       caption="American Community Survey 2016", 
        color = "Region", size = "Total Population") + 
   scale_x_log10(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)) + 
   scale_y_log10(breaks = c(0, 5, 10, 15, 20, 25, 30)) + 
@@ -133,7 +133,7 @@ ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty
        subtitle = "The Southern and Western US have more areas with better internet and less poverty and vice versa \nwhen compared to the Northeast and Midwest", 
        x = "Percent with no Internet", 
        y = "Percent Below Poverty Line", 
-       caption="US Census 2016 American Community Survey", 
+       caption="American Community Survey 2016", 
        color = "Region", size = "Total Population") + 
   scale_x_log10(breaks = c(0, 5, 10, 20, 35, 50)) + 
   scale_y_log10(breaks = c(0, 5, 10, 30)) + 
@@ -258,7 +258,8 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
   labs(title = "Faster Download Speeds Mean Costlier Internet", 
        subtitle = paste("Even in urban areas, ", round(perc_not_bb, 0), "% of survey respondents from 2015 - 2018 had internet slower \nthan the 25 Mbps minimum download speed for broadband as defined by the FCC", sep = ""),
        x = "Total Monthly Internet Cost (USD)",
-       y = "Download Speed (Mbps)", caption = "Urban Rate Broadband Survey") +
+       y = "Download Speed (Mbps)", 
+       caption = "Urban Rate Broadband Survey") +
   theme_master_dark()
 ```
 
@@ -295,7 +296,8 @@ ggplot(agg_urban_bb, aes(area = as.numeric(counts), fill = down_value, label = G
   scale_fill_gradientn(trans = "log10", colors = color_pal(5, type = "continuous")) + 
   labs(title = "Cable and Fiber ISPs Provide Better Value for Internet Service",
        subtitle = "Small ISPs that use Fiber to the Home are the best value",
-       fill = "Value \n(Megabits \nper USD)") +
+       fill = "Value \n(Megabits \nper USD)", 
+       caption = "Urban Rate Broadband Survey") +
   theme_master()
 ```
 
@@ -553,7 +555,8 @@ states_sf %>%
   labs(title = "Most of America has Internet Access",
        subtitle = "Even in rural counties, the majority of households have internet access",
       color = "Percent with \nInternet",
-       size = "Population Density \n(ppl/sq mi)") +
+       size = "Population Density \n(ppl/sq mi)",
+      caption = "American Community Survey 2017") +
    theme_map() +
   theme(axis.text = element_blank())
 ```
@@ -573,7 +576,8 @@ states_sf %>%
   labs(title = "Rural Counties have Less Access to Broadband Internet",
        subtitle = "Even in urban areas, many households, while having Internet, do not have broadband Internet access",
       color = "Percent with \nBroadband",
-       size = "Population Density \n(ppl/sq mi)") +
+       size = "Population Density \n(ppl/sq mi)",
+      caption = "American Community Survey 2017") +
   theme_map(dark_theme = TRUE) +
   theme(axis.text = element_blank())
 ```
