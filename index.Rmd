@@ -431,40 +431,41 @@ ny_county_bb$subregion = tolower(ny_county_bb$NAME)
 ny_county_bb = ny_map_data %>% 
   full_join(ny_county_bb)
 ny_county_bb$pop_dens = ny_county_bb$`2010 Muni Population` / ny_county_bb$`Muni Area (sq mi)`
+
+ny_county_bb = gather(ny_county_bb[-25], key = "key", value = "value", `# Cable Providers`:`% Hse Units Wireless`)
+
+ny_county_bb$tech = ifelse(str_detect(ny_county_bb$key, "Cable"), 1, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "DSL"), 2, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "Fiber"), 3, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "Wireline"), 4, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "Wireless"), 5, 0)
+
+ny_county_bb$tech = recode(ny_county_bb$tech, `1` = "Cable", `2` = "DSL", `3` = "Fiber", `4` = "Wireline", `5` = "Wireless")
+
+ny_county_bb$measure = ifelse(str_detect(ny_county_bb$key, "Provid"), 1, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "# Hse"), 2, 0) + 
+  ifelse(str_detect(ny_county_bb$key, "% Hse"), 3, 0)
+
+ny_county_bb$measure = recode(ny_county_bb$measure, `1` = "num_prov", `2` = "num_homes", `3` = "perc_homes")
+
+ny_county_bb = spread(ny_county_bb[-11], measure, value)
+ny_county_bb$perc_homes = ny_county_bb$perc_homes / 100 
 ```
 
 ```{r nys-1, message=FALSE, warning=FALSE}
-ny_county_bb$`# Fiber Providers` = ny_county_bb$`# Fiber Providers` %>% ordered()
-levels(ny_county_bb$`# Fiber Providers`) = list("1" = c(1), "2" = c(2), "3" = c(3), "4" = c(4), "5" = c(5), "6+" = c(6,7,8,9) )
-ggplot(data = ny_county_bb, 
-       aes(y = pop_dens, x = as.factor(ny_county_bb$`# Fiber Providers`))) + 
-  geom_violin(aes(fill = as.factor(ny_county_bb$`# Fiber Providers`), 
-                  color = as.factor(ny_county_bb$`# Fiber Providers`))) + 
+ny_county_bb$num_prov = ny_county_bb$num_prov %>% ordered()
+levels(ny_county_bb$num_prov) = list("1" = c(1), "2" = c(2), "3" = c(3), "4" = c(4), "5" = c(5), "6+" = c(6,7,8,9,10,11,12,13) )
+ggplot(data = subset(ny_county_bb, tech != "Wireline"), 
+       aes(y = pop_dens, x = num_prov)) + 
+  geom_violin(aes(fill = num_prov, 
+                  color = num_prov)) + 
   scale_fill_manual(values = color_pal(6)) +
   scale_color_manual(values = color_pal(6)) +
-  scale_y_continuous(trans = "log10") + 
-  labs(title = "Urban Areas Have More Fiber Internet Choices",
-       subtitle = "The more dense a New York county is, the more likely it is to have several fiber providers",
-       x = "Number of Fiber Providers per County", 
-       y = "Population Density of County (ppl/sq mi)",
-       caption = "New York State Broadband Availability By Municipality") + 
-  theme_master() +
-  theme(legend.position="none") + 
-  theme(panel.grid.minor = element_blank())
-```
-
-```{r nys-2}
-ggplot(data = ny_county_bb, 
-       aes(y = pop_dens, 
-           x = as.factor(ny_county_bb$`# Cable Providers`))) + 
-  geom_violin(aes(fill = as.factor(ny_county_bb$`# Cable Providers`), 
-                  color = as.factor(ny_county_bb$`# Cable Providers`))) + 
-  scale_fill_manual(values = color_pal(4)) +
-  scale_color_manual(values = color_pal(4)) +
-  scale_y_continuous(trans = "log10") + 
-  labs(title = "Urban Areas Have More Cable Internet Choices",
-       subtitle = "The more dense a New York county is, the more likely it is to have several cable providers",
-       x = "Number of Cable Providers per County",
+  scale_y_continuous(trans = "log10") +
+  facet_wrap(~ tech) +
+  labs(title = "Urban Counties Have More Internet Choices",
+       subtitle = "However, multiple DSL providers are more likely in rural counties",
+       x = "Number of Internet Service Providers per County", 
        y = "Population Density of County (ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") + 
   theme_master() +
@@ -475,20 +476,23 @@ ggplot(data = ny_county_bb,
 This data from New York offers some evidence that there are more ISPs the more population dense a county is. This suggests that ISPs are hesitant to enter a new market in rural areas, either because of the high barrier of entry, or due to existing ISPs in the market protecting their investment through tactics like exclusivity agreements with municipalities. 
 
 ```{r nys-3, echo=TRUE}
-ny_county_bb = ny_county_bb [rev(order(ny_county_bb $pop_dens)),]
+avg_wired_int = sum(subset(ny_county_bb, tech == "Wireline")$`2010 Muni Population` * subset(ny_county_bb, tech == "Wireline")$perc_homes) / sum(subset(ny_county_bb, tech == "Wireline")$`2010 Muni Population`)
 
-ny_map + geom_sf(data = ny_county_bb, 
-                 aes(fill = `% Hse Units Cable` / 100,
-                     color = `% Hse Units Cable` / 100,
+perc_homes_temp = cut(subset(ny_county_bb, tech == "Wireline")$perc_homes, 
+                   breaks = c(0.75, 0.8, 0.85, 0.9, 0.95, 1), 
+                   labels = c("75-79%", "80-84%", "85-89%","90-94%", "95-100%"))
+
+ny_map + geom_sf(data = subset(ny_county_bb, tech == "Wireline"), 
+                 aes(fill = perc_homes_temp,
+                     color = perc_homes_temp,
                      alpha = pop_dens),
                  size = 0.7) + 
- scale_fill_gradientn(colors = color_pal(5, type = "continuous"), 
-                        labels = percent_format(accuracy = 1)) +
-  scale_color_gradientn(colors = color_pal(5, type = "continuous"), 
-                        labels = percent_format(accuracy = 1)) +
-  scale_alpha(trans = "log", range = c(0.1, 1), limits = c(1, 50000), breaks = c(5, 20, 400, 8000)) +
-  labs(title = "Rural Counties have Less Cable Internet Coverage",
-       subtitle = "Less populous counties proportionately have less households with cable internet",
+  scale_fill_manual(values = color_pal(5, type = "cool")) +
+  scale_color_manual(values = color_pal(5, type = "cool")) +
+  scale_alpha(trans = "log", range = c(0.1, 1), breaks = c(15, 250, 4000, 45000), labels = c("15", "250", "4,000", "45,000")) +
+  guides(color = guide_legend(reverse=T), fill = guide_legend(reverse=T)) +
+  labs(title = "Rural Counties have Less Wired Internet Coverage",
+       subtitle = paste("Yet, ", round(avg_wired_int * 100), "% of the New York population has access to wired internet service", sep = ""),
        fill = "Percent with \nCable Internet",
        color = "Percent with \nCable Internet",
        alpha = "Population Density \n(ppl/sq mi)",
@@ -498,25 +502,41 @@ ny_map + geom_sf(data = ny_county_bb,
         legend.position = "right")
 ```
 
-```{r nys-4}
-ny_map + geom_sf(data = ny_county_bb, 
-                 aes(fill = `% Hse Units Fiber` / 100,
-                     color = `% Hse Units Fiber` / 100,
+```{r nys-4, echo=TRUE}
+avg_fiber_int = sum(subset(ny_county_bb, tech == "Fiber")$`2010 Muni Population` * subset(ny_county_bb, tech == "Fiber")$perc_homes) / sum(subset(ny_county_bb, tech == "Fiber")$`2010 Muni Population`)
+
+avg_cable_int = sum(subset(ny_county_bb, tech == "Cable")$`2010 Muni Population` * subset(ny_county_bb, tech == "Cable")$perc_homes) / sum(subset(ny_county_bb, tech == "Cable")$`2010 Muni Population`)
+
+avg_dsl_int = sum(subset(ny_county_bb, tech == "DSL")$`2010 Muni Population` * subset(ny_county_bb, tech == "DSL")$perc_homes) / sum(subset(ny_county_bb, tech == "DSL")$`2010 Muni Population`)
+
+avg_wireless_int = sum(subset(ny_county_bb, tech == "Wireless")$`2010 Muni Population` * subset(ny_county_bb, tech == "Wireless")$perc_homes) / sum(subset(ny_county_bb, tech == "Wireless")$`2010 Muni Population`)
+
+perc_homes_temp = cut(subset(ny_county_bb, tech != "Wireline")$perc_homes, 
+                   breaks = c(-0.1, 0.2, 0.4, 0.6, 0.8, 1), 
+                   labels = c("0-19%", "20-39%", "40-59%", "60-89%", "90-100%"))
+
+ny_map + geom_sf(data = subset(ny_county_bb, tech != "Wireline"), 
+                 aes(fill = perc_homes_temp,
+                     color = perc_homes_temp,
                      alpha = pop_dens),
                  size = 0.7) + 
-  scale_fill_gradientn(colors = color_pal(5, type = "continuous"), 
-                        labels = percent_format(accuracy = 1)) +
-  scale_color_gradientn(colors = color_pal(5, type = "continuous"), 
-                        labels = percent_format(accuracy = 1)) +
-  scale_alpha(trans = "log", range = c(0.1, 1), limits = c(1, 50000), breaks = c(5, 20, 400, 8000)) +
-  labs(title = "Rural Counties have Less Fiber Internet Coverage",
-       subtitle = "Less populous counties proportionately have less households with fiber internet",
-       fill = "Percent with \nFiber Internet",
-       color = "Percent with \nFiber Internet",
+ scale_fill_manual(values = color_pal(5, type = "continuous")) +
+  scale_color_manual(values = color_pal(5, type = "continuous")) +
+  scale_alpha(trans = "log", range = c(0.1, 1), breaks = c(15, 250, 4000, 45000), labels = c("15", "250", "4,000", "45,000")) +
+  guides(color = guide_legend(reverse=T), fill = guide_legend(reverse=T)) +
+  facet_wrap(~ tech) +
+  labs(title = "Fiber Internet is Almost Exclusively Available to the Metro NYC Area",
+       subtitle = paste("Only ", round(avg_fiber_int * 100),
+                        "% of the New York population has access to fiber internet service \ncompared to ", 
+                        round(avg_cable_int * 100), "% for cable, " , 
+                        round(avg_dsl_int * 100), "% for DSL, " , 
+                        round(avg_wireless_int * 100), "% for wireless (cellular) service" , sep = ""),
+       fill = "Percent with \nCable Internet",
+       color = "Percent with \nCable Internet",
        alpha = "Population Density \n(ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") +
     theme_map() +
-  theme(axis.text = element_blank(), 
+  theme(axis.text = element_blank(),
         legend.position = "right")
 ```
 
