@@ -117,7 +117,8 @@ ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty
        color = "Region", size = "Total Population") + 
   scale_x_log10(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)) + 
   scale_y_log10(breaks = c(0, 5, 10, 15, 20, 25, 30)) + 
-  theme_master()
+  theme_master() + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 As stated previously, there is evidence that a lack of Internet access can exacerbate inequality. While there is not enough evidence to make a causal relationship, the strong correlation between poverty and Internet access at least shows that a relationship does exist between the two. The lack of a clear trend between region or county population and this internet access - poverty relationship suggests that this relationship holds true across all of America.
@@ -137,7 +138,8 @@ ggplot(data = people_net, aes(x = percent_no_internet, y = percent_below_poverty
        color = "Region", size = "Total Population") + 
   scale_x_log10(breaks = c(0, 5, 10, 20, 35, 50)) + 
   scale_y_log10(breaks = c(0, 5, 10, 30)) + 
-  theme_master()
+  theme_master()+ 
+  theme(panel.grid.minor = element_blank())
 ```
 
 However, despite the increased variance in the South and West, the relationship between Internet Access and Poverty holds true across the US. Perhaps the wider range of population density in the South and West exacerbates the disparity of this relationship. The extreme outlier in the lower left corner in Western America, is Douglas County, which is in the top 10 most populated counties in Colorado.
@@ -260,7 +262,8 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
        x = "Total Monthly Internet Cost (USD)",
        y = "Download Speed (Mbps)", 
        caption = "Urban Rate Broadband Survey") +
-  theme_master_dark()
+  theme_master_dark() + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 Existing literature suggests that rural areas have disproportionately less broadband Internet access than urban areas. However, even in urban areas, Internet access can be extremely expensive, even for access that does not meet the FCC's minimum bandwidth requirements to be legally considered broadband internet. While, for the most part, people can pay more to get faster speeds, inflated pricing disproportionately affects lower income families, who may become stuck with slow internet as it is all that they can afford.
@@ -280,7 +283,8 @@ ggplot(data = filter(urban_bb, Technology != "Other"), aes(x = `Total Charge`, y
        y = "Download Speed (Mbps)", 
        caption = "Urban Rate Broadband Survey") +
   theme_master() +
-  hide_legend
+  hide_legend + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 Naturally, download speeds vary by the technology that Internet Service Providers use in their network. Fiber to the Home offers the highest speeds, followed by cable, however both have a similar price to speed ratio. DSL is typically much slower, but also less expensive, while Fixed Wireless is, overall, more expensive for the same speeds compared to other technologies.
@@ -319,7 +323,8 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
        color = "Year",
        caption = "Urban Rate Broadband Survey") +
   theme_master() +
-  hide_legend
+  hide_legend + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 ```{r ubs-4, message=FALSE, warning=FALSE, cache=TRUE}
@@ -336,7 +341,8 @@ ggplot(data = urban_bb, aes(x = factor(`Year`), y = `Total Charge`)) +
        y = "Total Monthly Internet Cost (USD)",
        caption = "Urban Rate Broadband Survey") +
   theme_master() +
-  theme(legend.position="none")
+  theme(legend.position="none") + 
+  theme(panel.grid.minor = element_blank())
 ```
 <div class="dark_theme">
 ```{r ubs-5, message=FALSE, warning=FALSE, cache=TRUE}
@@ -356,7 +362,8 @@ ggplot(data = urban_bb, aes(x = factor(`Year`), y = `Download Bandwidth Mbps`)) 
        y = "Download Speed (Mbps)",
        caption = "Urban Rate Broadband Survey") +
   theme_master_dark() +
-  theme(legend.position="none")
+  theme(legend.position="none") + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 Even though prices have slightly increased, there is a clear trend in people purchasing faster internet over time. This perhaps indicates that either people are upgrading their internet to faster speeds as it become available, or that faster internet has become more of a necessity, causing people to be more willing to pay for better internet. Regardless, more people have internet that meets the FCC minimum requirements for broadband in 2018 than 2015.
@@ -442,7 +449,8 @@ ggplot(data = ny_county_bb,
        y = "Population Density of County (ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") + 
   theme_master() +
-  theme(legend.position="none")
+  theme(legend.position="none") + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 ```{r nys-2}
@@ -460,7 +468,8 @@ ggplot(data = ny_county_bb,
        y = "Population Density of County (ppl/sq mi)",
        caption = "New York State Broadband Availability By Municipality") + 
   theme_master() +
-  theme(legend.position="none")
+  theme(legend.position="none") + 
+  theme(panel.grid.minor = element_blank())
 ```
 
 This data from New York offers some evidence that there are more ISPs the more population dense a county is. This suggests that ISPs are hesitant to enter a new market in rural areas, either because of the high barrier of entry, or due to existing ISPs in the market protecting their investment through tactics like exclusivity agreements with municipalities. 
