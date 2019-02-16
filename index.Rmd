@@ -278,7 +278,8 @@ ggplot(data = filter(urban_bb, Technology != "Other"), aes(x = `Total Charge`, y
   facet_wrap(~ Technology) +
   scale_y_continuous(trans = "log10") +
   scale_x_continuous(trans = "log10") +
-  labs(title = "Download Speeds and Costs Vary by Network Technology",
+  labs(title = "Fixed Wireless Providers Consistently Deliver the Worst Value",
+       subtitle = "Regardless of technology, pricing and speeds vary greatly across America",
        x = "Total Monthly Internet Cost (USD)",
        y = "Download Speed (Mbps)", 
        caption = "Urban Rate Broadband Survey") +
@@ -316,7 +317,7 @@ ggplot(data = urban_bb, aes(x = `Total Charge`, y = `Download Bandwidth Mbps`)) 
   facet_wrap(~ Year) +
   scale_y_continuous(trans = "log10") +
   scale_x_continuous(trans = "log10") +
-  labs(title = "Download Speeds and Costs Vary by Year",
+  labs(title = "Faster Download Speeds are Becoming More Prevalent",
        subtitle = "Even as faster speeds have become more common over time, the relationship \nbetween price and download speed has changed very little.",
        x = "Total Monthly Internet Cost (USD)",
        y = "Download Speed (Mbps)",
@@ -570,6 +571,8 @@ acs_17_mod = acs_17_mod[rev(order(acs_17_mod$pop_dens)),]
 ```
 
 ```{r mapping-internet-data} 
+avg_us_int = 1 - (sum(acs_17_mod$total_pop * acs_17_mod$no_inet) / sum(sum(acs_17_mod$total_pop)))
+
 states_sf %>% 
   ggplot() + 
   geom_sf(color = "grey90", fill = "white") +
@@ -581,7 +584,7 @@ states_sf %>%
   scale_color_gradientn(colors = color_pal(6, type = "cool"), labels = percent_format(accuracy = 1)) +
   scale_size(range = c(0.5, 15), breaks = c(50, 500, 5000, 50000)) +
   scale_alpha(range = c(1.0, 0.05)) +
-  labs(title = "Most of America has Internet Access",
+  labs(title = paste(round(avg_us_int * 100), "% of America has Internet Access", sep = ""),
        subtitle = "Even in rural counties, the majority of households have internet access",
       color = "Percent with \nInternet",
        size = "Population Density \n(ppl/sq mi)",
