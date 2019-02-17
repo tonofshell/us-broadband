@@ -1,6 +1,8 @@
 Visual Analysis of US Broadband Disparities
 ================
 
+### [View the project here!](http://tonofshell.me/us-broadband)
+
 Background
 ----------
 
@@ -8,18 +10,17 @@ As online services and devices become increasingly ingrained and necessary in ou
 
 Yet, despite this necessity, millions of Americans have little to no access to broadband internet, most of them in rural areas where Internet Service Providers deem it unprofitable to provide broadband service (Fingas 2018). A lack of fast broadband Internet also means a lack of new business investment in the community, as most modern businesses require fast, reliable internet just to run, causing many rural communities to take things into their own hands (Kang 2017).
 
-These issues are magnified by the gross inaccuracies often found on reports analyzing broadband connectivity, creating little motivation by policy makers to fix things (Lenz 2018). This, and other factors like unaffordable broadband prices, exacerbates inequality, by restricting opportunities for communication, education, and employment to those who need them most, like unemployed citizens (Fingas 2018).
+These issues are magnified by the gross inaccuracies often found on reports analyzing broadband connectivity, creating little motivation by policy makers to fix things (Lenz 2018). This, and other factors like unaffordable broadband prices, exacerbates inequality, by restricting opportunities for communication, education, and employment to those who need them most, like unemployed citizens (Fingas 2018). This project attempts to visualize these disparities in broadband access and inequality from a selection of publicly available data on the matter.
 
 Data
 ----
 
-| Name/Link                                                                                                               | Rows      | Vars | Unit          |
-|-------------------------------------------------------------------------------------------------------------------------|-----------|------|---------------|
-| [ConnectBoulder Wi-Fi Usage](http://data.opencolorado.org/dataset/boulder-connect-boulder-wifi-usage)                   | 4,517,064 | 15   | Wi-Fi Session |
-| [NYS Broadband Availability](https://data.ny.gov/Economic-Development/Broadband-Availability-By-Municipality/sjc6-ftj4) | 1,635     | 24   | Municipality  |
-| [People Without Internet](https://www.kaggle.com/madaha/people-without-internet)                                        | 821       | 23   | Municipality  |
-| [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)       | 9,122     | 14   | ISP in Market |
-| [Gaming, Jobs, and Broadband Survey](http://www.pewinternet.org/dataset/june-2015-gaming-jobs-broadband/)               | 2,001     | 140  | Person        |
+| Name/Link                                                                                                               | Rows  | Vars | Unit          |
+|-------------------------------------------------------------------------------------------------------------------------|-------|------|---------------|
+| [NYS Broadband Availability](https://data.ny.gov/Economic-Development/Broadband-Availability-By-Municipality/sjc6-ftj4) | 1,635 | 24   | Municipality  |
+| [People Without Internet](https://www.kaggle.com/madaha/people-without-internet)                                        | 821   | 23   | Municipality  |
+| [Urban Rate Broadband Survey](https://public.opendatasoft.com/explore/dataset/urban-rate-broadband-survey/table/)       | 9,122 | 14   | ISP in Market |
+| [American Community Survey 2017](https://www.census.gov/programs-surveys/acs/)                                          | 3,108 | 36   | County        |
 
 Works Cited
 -----------

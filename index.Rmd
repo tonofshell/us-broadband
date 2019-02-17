@@ -47,7 +47,7 @@ As online services and devices become increasingly ingrained and necessary in ou
 
 Yet, despite this necessity, millions of Americans have little to no access to broadband internet, most of them in rural areas where Internet Service Providers deem it unprofitable to provide broadband service [@fingas]. A lack of fast broadband Internet also means a lack of new business investment in the community, as most modern businesses require fast, reliable internet just to run, causing many rural communities to take things into their own hands [@kang]. 
 
-These issues are magnified by the gross inaccuracies often found on reports analyzing broadband connectivity, creating little motivation by policy makers to fix things [@lenz]. This, and other factors like unaffordable broadband prices, exacerbates inequality, by restricting opportunities for communication, education, and employment to those who need them most, like unemployed citizens [@fingas]. 
+These issues are magnified by the gross inaccuracies often found on reports analyzing broadband connectivity, creating little motivation by policy makers to fix things [@lenz]. This, and other factors like unaffordable broadband prices, exacerbates inequality, by restricting opportunities for communication, education, and employment to those who need them most, like unemployed citizens [@fingas]. This project attempts to visualize these disparities in broadband access and inequality from a selection of publicly available data on the matter.
 
 ## Data
 | Name/Link                          | Rows      | Vars  | Unit          |
@@ -78,11 +78,9 @@ library(treemapify)
 source("theme.R")
 
 windows.options(antialias = "cleartype")
-options(device = Cairo::CairoWin)
+options(device = Cairo::CairoSVG)
 
-# install.packages("colorspace", repos = "http://R-Forge.R-project.org")
-devtools::install_github("clauswilke/multiscales")
-knitr::opts_chunk$set(fig.width=10, fig.height=7) 
+knitr::opts_chunk$set(fig.width=10, fig.height=7, dev = "svg") 
 ```
 
 ##People Without Internet (American Community Survey 2016)
@@ -530,7 +528,7 @@ ny_map + geom_sf(data = subset(ny_county_bb, tech != "Wireline"),
                  aes(fill = perc_homes_temp,
                      color = perc_homes_temp,
                      alpha = pop_dens),
-                 size = 0.7) + 
+                 size = 0.4) + 
  scale_fill_manual(values = color_pal(5, type = "continuous")) +
   scale_color_manual(values = color_pal(5, type = "continuous")) +
   scale_alpha(trans = "log", range = c(0.1, 1), breaks = c(15, 250, 4000, 45000), labels = c("15", "250", "4,000", "45,000")) +
