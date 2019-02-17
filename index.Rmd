@@ -371,6 +371,8 @@ Even though prices have slightly increased, there is a clear trend in people pur
 </div>
 
 ```{r ubs-6, message=FALSE, warning=FALSE, cache=TRUE}
+chart_labels = tibble(text = c("Cable", "DSL", "Fixed wireless", "FTTH", "Other"), x = rep(c(2016), times = 5), y = c(0.47, 0.27, 0.16, 0.07, 0.00))
+
 get_perc = function(data_set, category, n_var) {
   len = length(data_set[[1]])
   for (i in 1:len) {
@@ -389,22 +391,28 @@ urban_bb[c(2,5)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
   ggplot(aes(x = as.numeric(Year), color = Technology, y = as.numeric(percent))) + 
   scale_color_manual(values = color_pal(5)) +
   geom_line(size = 1.5) + geom_point(size = 2) +
+  geom_label(data = chart_labels, aes(x = x, y = y, label = text), color = color_pal(5), family = "Pragati Narrow", fontface = "bold", size = 6) +
   labs(title = "More People are Choosing Fiber to the Home and Fixed Wireless Internet",
-       subtitle = "The amount of survey respondents who had Cable or DSL Internet \nhas decreased between 2015 and 2018",
+       subtitle = "The amount of survey respondents who had Cable or DSL Internet has decreased between 2015 and 2018",
        x = "Year", 
        y = "Percentage of Respondents",
        caption = "Urban Rate Broadband Survey") +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1), breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5)) +
-  theme_master() 
+  theme_master() + 
+  hide_legend + 
+  theme(panel.grid.minor.x = element_blank())
 ```
 
 More people are choosing Fiber to the Home for their internet access in 2018 than previous years. This offers evidence that fiber is becoming more accessible to people, either due to increased investment in fiber infrastructure by ISPs, or from more competitive pricing by ISPs that use Fiber to the Home technology.
 
 ```{r ubs-7, message=FALSE, warning=FALSE, cache=TRUE}
+chart_labels = tibble(text = c("No cap", "Data cap"), x = rep(c(2017), times = 2), y = c(0.56, 0.36))
+
 urban_bb$usage_limit = (urban_bb$`Usage Allowance GB` != "Unlimited")
 urban_bb[c(2,19)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
   ggplot(aes(x = as.numeric(Year), color = usage_limit, y = percent)) + 
   scale_color_manual(values = color_pal(2, reverse = TRUE), labels = c("No", "Yes")) +
+  geom_label(data = chart_labels, aes(x = x, y = y, label = text), color = color_pal(2, reverse = TRUE), family = "Pragati Narrow", fontface = "bold", size = 6) +
   geom_line(size = 1.5) + geom_point(size = 2) +
   labs(title = "Data Caps are Not Disappearing",
        subtitle = "The amount of survey respondents who had Internet Service with a monthly data cap \nhas neither grown or decreased substantially between 2015 and 2018",
@@ -413,7 +421,9 @@ urban_bb[c(2,19)] %>% table() %>% as_tibble() %>% get_perc("Year", "n") %>%
        y = "Percentage of Respondents",
        caption = "Urban Rate Broadband Survey") +
   scale_y_continuous(labels = percent_format(), limits = c(0, 0.65)) +
-  theme_master() 
+  theme_master() + 
+  hide_legend + 
+  theme(panel.grid.minor.x = element_blank())
 ```
 Data Caps restrict the Internet service a customer pays for, only allowing a certain amount of data to be transferred per month. This not only disproportionately affects lower income families, it can also make it difficult or impossible to "cut the cord", and switch from TV to video streaming services. Data caps also make it more expensive for small businesses, who often may need to upgrade to "business" internet to avoid overage charges.
 
@@ -592,7 +602,7 @@ states_sf %>%
    theme_map() +
   theme(axis.text = element_blank())
 ```
-<div class="dark_theme">
+
 ```{r mapping-broadband-data} 
 states_sf %>% 
   ggplot() + 
@@ -610,11 +620,10 @@ states_sf %>%
       color = "Percent with \nBroadband",
        size = "Population Density \n(ppl/sq mi)",
       caption = "American Community Survey 2017") +
-  theme_map(dark_theme = TRUE) +
+  theme_map() +
   theme(axis.text = element_blank())
 ```
 In rural counties in the United States, while most households have Internet access, many do not have Internet that meets the minimum speed requirements to be considered broadband Internet. However, this varies across the country. For example, Utah has much higher percentages of households for overall Internet access and broadband Internet access than many other rural states. In fact, despite its vastness, the western United States overall has much better accessibility to high-speed internet than other areas, most notably the rural South. 
 
-</div>
 
 ## Works Cited
