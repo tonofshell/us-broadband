@@ -4,15 +4,50 @@
         <meta charset="utf-8">
         <title>D3 Page Template</title>
         <script type="text/javascript" src="d3.js"></script>
+		<style>
+			div.bar {
+				display: inline-block;
+				width: 20px;
+				height: 75px;   /* We'll override height later */
+				background-color: teal;
+				margin-right: 2px;
+			}
+		</style>
     </head>
     <body>
         <script type="text/javascript">
-            d3.select("body").append("p").text("This is a test!");
-			var dataset;
-			d3.csv("../Datasets/US_Urban_Rate_Broadband_Survey.csv", function(data) {
+			window.addEventListener('resize', resizePlotArea);
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+			var resizePlotArea = function() {
+				w = window.innerWidth;
+				h = window.innerHeight;
+				svg.attr("width", w).attr("height", h);
+			}
+			var dataset = d3.json("urban_bb_sub.json", function(data) {
 				console.log(data);
 				dataset = data;
 			});
+			/*d3.csv("../Datasets/US_Urban_Rate_Broadband_Survey.csv", function(data) {
+				console.log(data);
+				dataset = data;
+			});*/
+			
+			var barPadding = 1;
+			var	circleRadius = 15;
+			
+			var svg = d3.select("body").append("svg")
+    			.attr("width", w)
+				.attr("height", h);
+			
+			svg.selectAll("circle")
+				.data(dataset)
+    			.enter()
+				.append("circle")
+				.attr("cx", function(d, i){ return w - (i * (w / dataset.length)) - (circleRadius * 2);})
+				.attr("cy", function(d, i){ return i * (h / dataset.length) + (circleRadius * 2);})
+				.attr("r", circleRadius);
+				/*.style("height", function(d){return (d * d) + "px"});*/
         </script>
     </body>
 </html>
