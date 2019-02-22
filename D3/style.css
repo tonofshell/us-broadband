@@ -4,6 +4,10 @@ body{
 	min-width: 500px;
 }
 
+svg{
+	margin: 20px;
+}
+
 .head{
 	width: 100%;
 	height: 200px;
