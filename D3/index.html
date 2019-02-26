@@ -5,80 +5,250 @@
         <title>D3 Page Template</title>
         <script type="text/javascript" src="d3.js"></script>
 		<script type="text/javascript" src="d3-scale.js"></script>
-		<link rel="stylesheet" type="text/css" src="style.css"></link>
+		<script type="text/javascript" src="d3-legend.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Pragati+Narrow:400,700&amp;subset=devanagari,latin-ext" rel="stylesheet">
+    	<link href="style.css" rel="stylesheet" type="text/css">
     </head>
-    <body>
-        <script type="text/javascript">
-			var w = 700;
-			var h = 500;
-			var padding = 30;
-			var	circleRadius = 4;
-			
-			//From https://bl.ocks.org/mbostock/7621155
-			var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹",
-    			formatPower = function(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
-			
-			d3.json("urban_bb_sub.json").then(function(data) {
-				if (data == null) {
-				console.log("Error loading data");
-				} else {
-					console.log("Data loaded");
-					console.log(data[0]);
+    <body onresize="reDraw()">
+		<div id="main"></div>
+			<script type="text/javascript">
+				var w = document.getElementById('main').offsetWidth;
+				var h = document.getElementById('main').offsetHeight - 50;
+				var padding = 85;
+				var	circleRadius = 6;
+				var topPadding = (4 / 3) * padding
+				var axisEndPadding = 3 * circleRadius;
+				var axisStartPadding = padding + axisEndPadding;
+				var savedData;
+
+				//From https://bl.ocks.org/mbostock/7621155
+				var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹",
+					formatPower = function(d) { return (d + "").split("").map(function(c) { return superscript[c]; }).join(""); };
+
+				d3.json("urban_bb_small.json").then(function(data) {
+					if (data == null) {
+					console.log("Error loading data");
+					} else {
+						console.log("Data loaded");
+						console.log(data[0]);
+					}
+					var xScale = d3.scaleLog()
+						.base(10)
+						.domain([0.2, d3.max(data, function(d) { return d["dload_speed"]; })])
+						.range([w - (axisStartPadding), axisEndPadding])
+						.nice();
+					var yScale = d3.scaleLinear()
+						.domain([0, d3.max(data, function(d) { return d["total_charge"]; })])
+						.range([axisStartPadding, h - axisEndPadding]);
+					var xAxis = d3.axisTop()
+						.scale(xScale)
+						.tickValues([1, 10, 100, 1000])
+						.tickFormat(function(d) { return Math.round(d); });
+					var yAxis = d3.axisRight().
+						scale(yScale);
+					var xMedian = xScale(d3.median(data, function(d){return d["dload_speed"];}));
+					var yMedian = yScale(d3.median(data, function(d){return d["total_charge"];}));
+					console.log(xMedian + " " + yMedian);
+					makeScatter(data, xScale, yScale, xAxis, yAxis, xMedian, yMedian);
+				});
+
+				var svg = d3.select("#main").append("svg")  
+					.attr("id", "scatterPlot")
+					.attr("width", w)
+					.attr("height", h);
+
+				var makeScatter = function(dataset, xScale, yScale, xAxis, yAxis, xMedian, yMedian) {
+//					console.log(dataset[0]);
+					savedData = dataset;
+//					console.log(savedData[0]);
+					svg.selectAll("circle")
+						.data(dataset)
+						.enter()
+						.append("circle")
+						.attr("cx", function(d){return xMedian;})
+						.attr("cy", function(d){return yMedian;})
+						.attr("r", function(d){return circleRadius;})
+						.attr("fill", "#C8DCC8")
+						.transition()
+						.duration(500)
+						.delay(function(d,i){return i / dataset.length * 500})
+						.ease(d3.easeElasticInOut)
+						.attr("cx", function(d){ return xScale(d["dload_speed"]); })
+						.attr("cy", function(d){ return yScale(d["total_charge"]); })
+						.transition()
+						.duration(500)
+						.ease(d3.easePolyIn)
+						.attr("class",function(d) { 
+							if (d["tech"] == "Fixed wireless") {return "Wireless"};
+							return d["tech"]})
+						.attr("data-legend",function(d) { return d["tech"]});
+
+					var ordinal = d3.scaleOrdinal()
+					.domain(["FTTH", "Cable", "Fixed wireless", "DSL", "Other"])
+					.range([ "#EB5028", "#FFAF3C", "#0FA0F5", "#9146F0", "#C8DCC8"]);
+
+
+					var legendOrdinal = d3.legendColor()
+						.scale(ordinal);
+
+					//x axis
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("id", "xaxis")
+						.attr("transform", "translate(0," + (0 + padding)+ ")")
+						.call(xAxis);
+
+					//y axis
+					svg.append("g")
+						.attr("class", "axis")
+						.attr("id", "yaxis")
+						.attr("transform", "translate(" + (w -  padding)+ ", 0)")
+						.call(yAxis);
+
+					console.log(document.getElementById("yaxis").getBoundingClientRect().height);
+
+					//y axis label
+					svg.append("text")
+						.attr("class", "axisLabel")
+						.attr("id", "yLabel")
+						.attr("x", function() {
+							yAxisHeight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return (yAxisHeight / 2) + axisStartPadding;
+						})
+						.attr("y", function() {
+							yAxisWidth = document.getElementById("yaxis").getBoundingClientRect().width;
+							return -w + (padding - (yAxisWidth + 10)); 
+						})
+						.style("text-anchor", "middle")
+						.attr("transform", "rotate(90)")
+						.text("Total Monthly Charge (USD)");
+
+					//x axis label
+					svg.append("text")
+						.attr("class", "axisLabel")
+						.attr("id", "xLabel")
+						.attr("y", function() {
+							xAxisHeight = document.getElementById("xaxis").getBoundingClientRect().height;
+							return padding - (xAxisHeight + 10);
+
+						})
+						.attr("x", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							return (xAxisWidth / 2) + axisEndPadding; 
+						})
+						.style("text-anchor", "middle")
+						.text("Download Speed (mbps)");
+
+					//title
+					svg.append("text")
+						.attr("class", "chartTitle")
+						.attr("x", axisEndPadding)
+						.attr("y", 20)
+						.text("Faster Download Speeds Mean Costlier Internet");
+					
+					//subtitle
+					svg.append("text")
+						.attr("class", "subTitle")
+						.attr("x", axisEndPadding)
+						.attr("y", 35)
+						.text("58% of survey respondents had internet slower than the 25 Mbps minimum download speed for broadband as defined by the FCC");
+					
+					//source
+					svg.append("text")
+						.attr("class", "sourceText")
+						.attr("x", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							return (0.8 * xAxisWidth) + axisEndPadding;
+						})
+						.attr("y", function() {
+							yAxisHeight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return (0.97 * yAxisHeight) + axisStartPadding;
+						})
+						.text("Urban Broadband Survey");
+
+					//legend 
+					svg.append("g")
+						.attr("class","legend")
+						.attr("transform", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							yAxisHeight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return "translate(" + ((0.75 * xAxisWidth) + axisEndPadding) + "," +  ((0.6 * yAxisHeight) + axisStartPadding) + ")";
+						})
+						.call(legendOrdinal);
 				}
-				var xScale = d3.scaleLog()
-					.base(10)
-               		.domain([0.2, d3.max(data, function(d) { return d["dload_speed"]; })])
-               		.range([w - (padding + 2 * circleRadius), padding +(2 * circleRadius) + 1])
-					.nice();
-				var yScale = d3.scaleLinear()
-               		.domain([0, d3.max(data, function(d) { return d["total_charge"]; })])
-               		.range([padding + (2 * circleRadius) + 1, h - (padding + 2 * circleRadius + 1)]);
-				var xAxis = d3.axisTop()
-					.scale(xScale)
-					.tickValues([1, 10, 100, 1000, 10000])
-					.tickFormat(function(d) { return Math.round(d); });
-				var yAxis = d3.axisRight().
-					scale(yScale);
-				makeScatter(data, xScale, yScale, xAxis, yAxis);
-			});
-			
-			var svg = d3.select("body").append("svg")              
-    			.attr("width", w)
-				.attr("height", h);
-			
-			var makeScatter = function(dataset, xScale, yScale, xAxis, yAxis) {
-				svg.selectAll("circle")
-					.data(dataset)
-					.enter()
-					.append("circle")
-					.attr("cx", function(d){return w / 2})
-					.attr("cy", function(d){return h / 2})
-					.attr("r", function(d){return 0})
-					.attr("fill", "black")
-					.transition()
-					.duration(2000)
-					.ease(d3.easeCircleIn)
-					.attr("cx", function(d){ return xScale(d["dload_speed"]); })
-					.attr("cy", function(d){ return yScale(d["total_charge"]); })
-					.attr("r", circleRadius)
-					.attr("fill", function(d){
-						if (d["tech"] == "FTTH") {return "blue"};
-						if (d["tech"] == "Cable") {return "red"};
-						if (d["tech"] == "Wireless") {return "orange"};
-						if (d["tech"] == "DSL") {return "green"};
-						return "grey";
+				
+				var reDraw = function() {
+					var w = document.getElementById('main').offsetWidth;
+					var h = document.getElementById('main').offsetHeight - 50;
+//					console.log(w + " " + h);
+//					console.log(savedData);
+					svg.attr("width", w);
+					svg.attr("height", h);
+					var xScale = d3.scaleLog()
+						.base(10)
+						.domain([0.2, d3.max(savedData, function(d) { return d["dload_speed"]; })])
+						.range([w - (axisStartPadding), axisEndPadding])
+						.nice();
+					var yScale = d3.scaleLinear()
+						.domain([0, d3.max(savedData, function(d) { return d["total_charge"]; })])
+						.range([axisStartPadding, h - axisEndPadding]);
+					var xAxis = d3.axisTop()
+						.scale(xScale)
+						.tickValues([1, 10, 100, 1000])
+						.tickFormat(function(d) { return Math.round(d); });
+					var yAxis = d3.axisRight()
+						.scale(yScale);
+					var xMedian = xScale(d3.median(savedData, function(d){return d["dload_speed"];}));
+					var yMedian = yScale(d3.median(savedData, function(d){return d["total_charge"];}));
+					svg.selectAll("circle")
+						.transition()
+						.duration(150)
+						.delay(function(d,i){return i / savedData.length * 150})
+						.ease(d3.easePolyInOut)
+						.attr("cx", function(d){ return xScale(d["dload_speed"]); })
+						.attr("cy", function(d){ return yScale(d["total_charge"]); });
+					d3.select("#xaxis")
+						.attr("transform", "translate(0," + (0 + padding)+ ")")
+						.call(xAxis);
+					d3.select("#yaxis").attr("transform", "translate(" + (w -  padding)+ ", 0)")
+						.call(yAxis);
+					d3.select("#yLabel") 
+						.attr("x", function() {
+							yAxisHeight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return (yAxisHeight / 2) + axisStartPadding;
+						})
+						.attr("y", function() {
+							yAxisWidth = document.getElementById("yaxis").getBoundingClientRect().width;
+							return -w + (padding - (yAxisWidth + 10)); 
 					});
-				
-				svg.append("g")
-					.attr("class", "axis")
-					.attr("transform", "translate(0," + (0 + padding)+ ")")
-					.call(xAxis);
-				
-				svg.append("g")
-					.attr("class", "axis")
-					.attr("transform", "translate(" + (w - padding)+ ", 0)")
-					.call(yAxis);
-			}
-        </script>
+					d3.select("#xLabel")
+					.attr("y", function() {
+							xAxisHeight = document.getElementById("xaxis").getBoundingClientRect().height;
+							return padding - (xAxisHeight + 10);
+
+						})
+						.attr("x", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							return (xAxisWidth / 2) + axisEndPadding; 
+						});
+					
+					d3.select(".legend")
+						.attr("transform", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							yAxisheight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return "translate(" + ((0.75 * xAxisWidth) + axisEndPadding) + "," +  ((0.6 * yAxisHeight) + axisStartPadding) + ")";
+						});
+					
+					d3.select(".sourceText")
+						.attr("x", function() {
+							xAxisWidth = document.getElementById("xaxis").getBoundingClientRect().width;
+							return (0.8 * xAxisWidth) + axisEndPadding;
+						})
+						.attr("y", function() {
+							yAxisHeight = document.getElementById("yaxis").getBoundingClientRect().height;
+							return (0.97 * yAxisHeight) + axisStartPadding;
+						});
+				}
+			</script>
     </body>
 </html>

@@ -1,43 +1,55 @@
 /* CSS Document */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
 
 body{
 	min-width: 500px;
+	height: 97vh;
+	width: 97vw;
+	margin: 0px;
+	font-family: 'Pragati Narrow', sans-serif;
+}
+
+#main{
+	min-width: 650px;
+	min-height: 600px;
+	height: 100%;
+	width: 100%;
+	float: left;
+	margin-bottom: 50px;
 }
 
 svg{
 	margin: 20px;
 }
 
-.head{
-	width: 100%;
-	height: 200px;
-	background-color: #5A5A5A;
-	
+.chartTitle{
+	font-size: 23pt;
+	font-weight: 700;
 }
 
-.wrapper{
-	height: 700px;
-	display: flex;
-	align-content: flex-start;
+.axisLabel{
+	font-weight: 700;
 }
 
-.left-bar{
-	width: 25%;
-	background-color: #EB5028;
+.subTitle {
+	font-style: italic;
 }
 
-.content{
-	width: 50%;
-	background-color: #FFD747;
+.FTTH {
+	fill: #EB5028;
 }
 
-.right-bar{
-	width: 25%;
-	background-color: #0FA0F5;
+.Cable {
+	fill: #FFAF3C;
 }
 
-.bottom{
-	height: 200px;
-	width: 100%;
-	background-color: #9146F0;
+.Wireless {
+	fill: #0FA0F5;
+}
+
+.DSL {
+	fill: #9146F0;
 }
