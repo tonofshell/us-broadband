@@ -8,3 +8,4 @@ Datasets/
 index_cache/
 index_files/
 api_keys.R
+node_modules/

@@ -37,4 +37,4 @@ geo_js = acs_17_mod$geometry %>% geojson_json(group = "geometry", geometry = "po
 
 geo_js = ms_simplify(geo_js)
 
-write_lines(here("D3", "acs_geo_data_simp.json"))
+geo_js %>% write_lines(here("D3", "acs_geo_data_simp.geojson"))

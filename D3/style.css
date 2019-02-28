@@ -6,10 +6,20 @@ html, body {
 
 body{
 	min-width: 500px;
-	height: 97vh;
-	width: 97vw;
+	height: 100vh;
+	width: 100vw;
 	margin: 0px;
 	font-family: 'Pragati Narrow', sans-serif;
+}
+
+svg{
+	margin: 20px;
+}
+
+.map-wrapper {
+	min-height: 300px;
+	height: 100%;
+	background-color: aquamarine;
 }
 
 #main{
@@ -21,11 +31,9 @@ body{
 	margin-bottom: 50px;
 }
 
-svg{
-	margin: 20px;
-}
 
-.chartTitle{
+
+/*.chartTitle{
 	font-size: 23pt;
 	font-weight: 700;
 }
@@ -52,4 +60,4 @@ svg{
 
 .DSL {
 	fill: #9146F0;
-}
+}*/
