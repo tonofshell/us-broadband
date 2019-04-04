@@ -14,9 +14,9 @@ if (save_key) {
   acs_vars_17 = load_variables(year = 2017, dataset = "acs5")
   saveRDS(acs_vars_17, file = "Datasets/acs_vars_17.rds")
 }
-acs_17 = get_acs(geography = "county", year = 2017, geometry = TRUE, moe_level = 95,
+acs_17 = get_acs(geography = "county", year = 2017, geometry = FALSE, moe_level = 95,
                  variables = c(total_pop = "B01003_001", white = "B02001_002", 
-                               med_age = "B01002_001", med_income = "B19326_001", 
+                               native_amer = "B02010_001", med_age = "B01002_001", med_income = "B19326_001", 
                                female = "B01001_026", aggr_fam_inc = "B19127_001", 
                                below_poverty ="B10059_002", employed = "B27011_003", 
                                commute_time_car = "B08136_002", commute_time_pub_trans = "B08136_007", 
@@ -35,3 +35,5 @@ acs_17_moes = acs_17 %>% select(-one_of("estimate")) %>% spread(key = variable, 
 saveRDS(acs_17, file = "Datasets/acs_17.rds")
 saveRDS(acs_17_vals, file = "Datasets/acs_17_vals.rds")
 saveRDS(acs_17_moes, file = "Datasets/acs17_moes.rds")
+
+#acs_old = readRDS(here("Datasets", "Backup", "acs_17_vals.rds"))

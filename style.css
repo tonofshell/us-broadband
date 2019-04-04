@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css?family=Contrail+One|Pragati+Narrow|Roboto+Condensed:300');
+
 h1{
-  font-family: 'Contrail One', cursive;
+  font-family: 'Contrail One', sans-serif;
   font-size: 64pt;
   background: linear-gradient(to right, #EB5028, #9146F0, #0FA0F5 80%);
   -webkit-background-clip: text;
